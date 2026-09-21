@@ -1,0 +1,363 @@
+<!doctype html>
+<!--
+  PROTOTYPE — throwaway. Answers ticket "Live scoring screen and point input".
+  Three radically different live-scoring layouts on a simulated Apple Watch (Series 9, 41/45mm),
+  switchable via ?variant=A|B|C and the floating bar. Scoring engine is a quick replay of the
+  Point log per CONTEXT.md — not production code.
+  Run:  bun prototype/live-scoring/index.html
+  Keys: ←/→ variant · D = Double Tap · mouse wheel over watch = Digital Crown · Z = undo (debug)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Scoring Prototype</title>
+<style>
+  :root { --us:#30d158; --them:#ff9f0a; --ball:#d4ff3a; --gold:#ffcc00; --bg:#1c1c1e; --panel:#2c2c2e; --fg:#f2f2f7; --mut:#8e8e93; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px -apple-system, "SF Pro Text", system-ui, sans-serif; min-height:100vh; }
+  main { display:flex; gap:32px; padding:24px 16px 96px; justify-content:center; flex-wrap:wrap; align-items:flex-start; }
+  aside { width:280px; background:var(--panel); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  aside h3 { margin:6px 0 0; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--mut); }
+  aside label { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  select, input[type=text] { background:#3a3a3c; color:var(--fg); border:0; border-radius:6px; padding:4px 6px; font:inherit; max-width:150px; }
+  button.sm { background:#3a3a3c; color:var(--fg); border:0; border-radius:6px; padding:5px 8px; font:inherit; cursor:pointer; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; }
+  #hlog { font:12px ui-monospace, Menlo, monospace; color:var(--mut); max-height:170px; overflow:auto; white-space:pre; }
+  .hint { font-size:12px; color:var(--mut); line-height:1.4; }
+
+  /* watch */
+  .watch-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .case { position:relative; padding:18px; background:#0b0b0c; border-radius:78px; box-shadow:0 0 0 3px #3a3a3c, 0 20px 50px #0008; }
+  .crown { position:absolute; right:-14px; top:70px; width:14px; height:56px; background:repeating-linear-gradient(#555 0 3px,#333 3px 6px); border-radius:4px; }
+  .sidebtn { position:absolute; right:-9px; top:160px; width:9px; height:60px; background:#333; border-radius:3px; }
+  .scaler { transform-origin:top left; }
+  .screen { position:relative; overflow:hidden; background:#000; color:#fff; border-radius:36px; user-select:none; font-family:-apple-system,"SF Pro Rounded","SF Pro Display",system-ui,sans-serif; }
+  .clock { position:absolute; top:6px; right:14px; font-size:13px; font-weight:600; z-index:5; pointer-events:none; }
+  .flash { position:absolute; inset:0; pointer-events:none; z-index:20; opacity:0; transition:opacity .35s; }
+  .toast { position:absolute; left:50%; bottom:8px; transform:translateX(-50%); background:#333d; color:#fff; font-size:10px; padding:3px 8px; border-radius:10px; z-index:21; opacity:0; transition:opacity .3s; white-space:nowrap; pointer-events:none; }
+  .haptic { font:12px ui-monospace,Menlo,monospace; color:var(--mut); height:16px; }
+  .zone { cursor:pointer; }
+  .zone:active { filter:brightness(1.4); }
+  .ball { display:inline-block; width:.55em; height:.55em; border-radius:50%; background:var(--ball); vertical-align:middle; }
+
+  /* Always On: dim, drop fills, keep outlines */
+  .screen.aod { filter:brightness(.6) saturate(.35); }
+  .screen.aod .fill { background:transparent !important; box-shadow:inset 0 0 0 1.5px currentColor; }
+  .screen.aod .clock { font-weight:400; }
+
+  /* Variant A — halves */
+  .A { position:absolute; inset:0; display:flex; flex-direction:column; }
+  .A .half { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; }
+  .A .half .nm { font-size:12px; font-weight:600; opacity:.85; }
+  .A .half .pt { font-size:56px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+  .A .half .srv { position:absolute; left:14px; top:50%; font-size:18px; }
+  .A .mid { height:34px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:13px; font-weight:600; background:#111; }
+  .A .mid .gm { font-size:17px; font-variant-numeric:tabular-nums; }
+  .A .mid .chip { font-size:10px; color:#aaa; }
+  .A .mid.deciding { background:var(--gold); color:#000; }
+  .A .mid.deciding .chip { color:#000a; }
+  .screen.aod .A .mid.deciding { color:var(--gold); }
+  .A .us { background:#0f3d1c; color:var(--us); }
+  .A .topbar { height:26px; flex:none; background:#000; }
+  .A .ucorner { position:absolute; top:2px; left:14px; width:32px; height:24px; border-radius:12px; background:#000a; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; z-index:6; }
+  .A .ustrip { position:absolute; left:10px; top:50%; transform:translateY(-50%); width:30px; height:24px; border-radius:12px; background:#333; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .A .mid { position:relative; }
+  .A .them { background:#4a2e05; color:var(--them); }
+
+  /* Variant B — scoreboard + buttons */
+  .B { position:absolute; inset:0; display:flex; flex-direction:column; padding:26px 8px 8px; gap:6px; }
+  .B .undo { position:absolute; top:4px; left:10px; width:30px; height:22px; border-radius:11px; background:#333; color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .B .tag { position:absolute; top:7px; left:0; right:0; text-align:center; font-size:10px; font-weight:700; color:var(--gold); pointer-events:none; }
+  .B table { width:100%; border-collapse:separate; border-spacing:0 3px; font-variant-numeric:tabular-nums; }
+  .B td { padding:0 3px; font-size:14px; text-align:center; }
+  .B td.nm { text-align:left; font-weight:600; font-size:13px; max-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .B td.s { color:#8e8e93; font-size:12px; width:16px; }
+  .B td.g { font-weight:700; width:18px; }
+  .B td.p { width:38px; }
+  .B td.p span { display:block; background:#333; border-radius:6px; font-weight:700; font-size:17px; padding:2px 0; }
+  .B td.p.deciding span { background:var(--gold); color:#000; }
+  .B td.srv { width:12px; font-size:11px; }
+  .B .btns { flex:1; display:flex; gap:6px; }
+  .B .btn { flex:1; border-radius:18px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:700; font-size:15px; color:#000; }
+  .B .btn .plus { font-size:28px; line-height:1; }
+  .B .btn.us { background:var(--us); } .B .btn.them { background:var(--them); }
+  .screen.aod .B td.p.deciding span { color:var(--gold); }
+  .screen.aod .B .btn.us { color:var(--us); } .screen.aod .B .btn.them { color:var(--them); }
+
+  /* Variant C — focus + crown */
+  .C { position:absolute; inset:0; }
+  .C .zones { position:absolute; inset:0; display:flex; }
+  .C .zones > div { flex:1; }
+  .C .face { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+  .C .dots { position:absolute; top:10px; left:18px; display:flex; gap:6px; font-size:10px; font-variant-numeric:tabular-nums; color:#aaa; }
+  .C .names { display:flex; width:100%; justify-content:space-around; font-size:12px; font-weight:600; }
+  .C .big { display:flex; width:100%; justify-content:space-around; align-items:baseline; font-size:50px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.05; }
+  .C .big .colon { font-size:30px; color:#555; }
+  .C .games { font-size:22px; font-weight:600; color:#ccc; font-variant-numeric:tabular-nums; display:flex; gap:14px; align-items:center; }
+  .C .games small { font-size:10px; color:#777; }
+  .C .srvrow { display:flex; width:100%; justify-content:space-around; height:12px; }
+  .C .flag { position:absolute; bottom:10px; left:0; right:0; text-align:center; font-size:11px; font-weight:800; letter-spacing:.06em; color:var(--gold); }
+  .C.deciding { background:radial-gradient(circle at 50% 45%, #3d3200 0, #000 75%); }
+  .C .crownhint { position:absolute; right:4px; top:50%; transform:translateY(-50%); width:4px; height:60px; border-radius:2px; background:#333; overflow:hidden; }
+  .C .crownhint i { position:absolute; bottom:0; left:0; right:0; background:#fff; }
+
+  /* decided overlay (shared; summary itself is another ticket) */
+  .decided { position:absolute; inset:0; background:#000e; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; text-align:center; padding:12px; }
+  .decided b { font-size:18px; } .decided .sc { font-size:13px; color:#ccc; }
+  .decided .u { margin-top:6px; background:#333; border-radius:14px; padding:5px 14px; font-size:13px; }
+
+  /* switcher */
+  .switcher { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#fff; color:#000; border-radius:999px; box-shadow:0 6px 24px #0009; display:flex; align-items:center; gap:4px; padding:4px; z-index:100; font-weight:600; }
+  .switcher button { background:none; border:0; font-size:18px; width:36px; height:36px; border-radius:50%; cursor:pointer; }
+  .switcher button:hover { background:#eee; }
+  .switcher span { min-width:260px; text-align:center; }
+</style>
+</head>
+<body>
+<main>
+  <aside>
+    <strong>Match rules</strong>
+    <label>Format <select id="format">
+      <option value="3sets">3 sets</option><option value="2sets_stb">2 sets + super TB</option>
+      <option value="pro_tb">Pro set (TB)</option><option value="pro_stb">Pro set (STB)</option><option value="infinite">Infinite</option></select></label>
+    <label>Deuce rule <select id="deuce">
+      <option value="adv">Advantage</option><option value="golden" selected>Golden point</option>
+      <option value="silver">Silver point</option><option value="star">Star point</option></select></label>
+    <label>First serve <select id="first"><option value="0">Team 1</option><option value="1">Team 2</option></select></label>
+    <h3>Team labels</h3>
+    <label>Style <select id="labels"><option value="us">Us / Them</option><option value="ab">A / B</option><option value="custom">Custom</option></select></label>
+    <div class="row" id="customRow" style="display:none"><input type="text" id="n0" value="Rob & Leo"><input type="text" id="n1" value="Ana & Marc"></div>
+    <h3>Device</h3>
+    <label>Size <select id="size"><option value="41">Series 9 · 41mm</option><option value="45" selected>Series 9 · 45mm</option></select></label>
+    <label>Always On (dimmed) <input type="checkbox" id="aod"></label>
+    <label>A: undo button <select id="aundo"><option value="corner">Top-left corner</option><option value="bar">Top bar (outside halves)</option><option value="strip">In middle strip</option><option value="none">None</option></select></label>
+    <label>Double Tap does <select id="dt"><option value="">variant default</option><option value="undo">Undo</option><option value="p0">Point Team 1</option><option value="p1">Point Team 2</option><option value="none">Nothing</option></select></label>
+    <h3>Jump to</h3>
+    <div class="row">
+      <button class="sm" data-scn="reset">New match</button><button class="sm" data-scn="deuce">Deuce</button>
+      <button class="sm" data-scn="tb">Tie-break</button><button class="sm" data-scn="mid">Set 2, 3–2</button><button class="sm" data-scn="mp">Match point</button>
+    </div>
+    <h3>Haptics fired</h3>
+    <div id="hlog"></div>
+    <p class="hint">D = Double Tap · wheel over watch = Crown · ←/→ switch variant. Haptics are shown as text (a browser can't vibrate your wrist). They're named as WKHapticType values.</p>
+  </aside>
+  <div class="watch-wrap">
+    <div class="case" id="case"><div class="crown"></div><div class="sidebtn"></div>
+      <div id="scaler" class="scaler"><div class="screen" id="screen"></div></div>
+    </div>
+    <div class="haptic" id="haptic"></div>
+  </div>
+</main>
+<div class="switcher"><button id="prev">‹</button><span id="vlabel"></span><button id="next">›</button></div>
+
+<script>
+// ---------- scoring engine: replay the Point log (quick prototype, per CONTEXT.md) ----------
+function replay(r, log) {
+  const pro = r.format.startsWith('pro'), inf = r.format === 'infinite';
+  const target = pro ? 9 : 6, tbAt = pro ? 8 : 6;
+  const allowAdv = { adv: Infinity, golden: 0, silver: 1, star: 2 }[r.deuce];
+  const s = { sets: [], games: [0,0], pts: [0,0], gameNo: 0, tb: null, stbDecider: false, winner: null, ev: null };
+  const setsWon = () => [0,1].map(t => s.sets.filter(x => x.w === t).length);
+  const closeSet = (t, tbPts) => {
+    s.sets.push({ g: s.stbDecider ? tbPts : [...s.games], w: t, tbPts, stb: s.stbDecider });
+    s.games = [0,0]; s.ev = 'set';
+    const sw = setsWon();
+    if (pro || sw[t] === 2) { s.winner = t; s.ev = 'match'; }
+    else if (r.format === '2sets_stb' && sw[0] === 1 && sw[1] === 1) { s.tb = 10; s.stbDecider = true; }
+  };
+  const gameWon = t => {
+    const o = 1 - t, tbPts = s.tb ? [...s.pts] : null, wasTb = s.tb;
+    s.pts = [0,0]; s.gameNo++; s.ev = 'game';
+    if (inf) { s.games[t]++; return; }
+    if (wasTb) { s.tb = null; if (!s.stbDecider) s.games[t]++; closeSet(t, tbPts); return; }
+    s.games[t]++;
+    if (s.games[t] >= target && s.games[t] - s.games[o] >= 2) closeSet(t);
+    else if (s.games[0] === tbAt && s.games[1] === tbAt) s.tb = r.format === 'pro_stb' ? 10 : 7;
+  };
+  for (const t of log) {
+    if (s.winner !== null) break;
+    const o = 1 - t; s.ev = 'point';
+    if (s.tb) { s.pts[t]++; if (s.pts[t] >= s.tb && s.pts[t] - s.pts[o] >= 2) gameWon(t); }
+    else {
+      const a = s.pts[t], b = s.pts[o];
+      const deciding = a === b && a >= 3 && (a - 2) > allowAdv;
+      s.pts[t]++;
+      if (deciding || (s.pts[t] >= 4 && s.pts[t] - s.pts[o] >= 2)) gameWon(t);
+    }
+  }
+  // derived view
+  const base = r.first ^ (s.gameNo % 2);
+  const k = s.pts[0] + s.pts[1];
+  s.serving = !s.tb || k === 0 ? base : (Math.floor((k + 1) / 2) % 2 === 1 ? 1 - base : base);
+  s.deciding = !s.tb && s.pts[0] === s.pts[1] && s.pts[0] >= 3 && (s.pts[0] - 2) > allowAdv;
+  s.deuceN = !s.tb && s.pts[0] === s.pts[1] && s.pts[0] >= 3 ? s.pts[0] - 2 : 0;
+  s.setsWon = setsWon();
+  s.ptLabel = [0,1].map(t => {
+    if (s.tb) return String(s.pts[t]);
+    const a = s.pts[t], b = s.pts[1 - t];
+    if (a >= 3 && b >= 3) return a > b ? 'AD' : '40';
+    return ['0','15','30','40'][Math.min(a,3)];
+  });
+  s.tbName = s.tb === 10 ? 'SUPER TIE-BREAK' : s.tb ? 'TIE-BREAK' : '';
+  s.decidingName = { golden: 'GOLDEN POINT', silver: 'SILVER POINT', star: 'STAR POINT' }[r.deuce] || '';
+  return s;
+}
+
+// ---------- app state ----------
+const $ = id => document.getElementById(id);
+let log = [];
+const rules = () => ({ format: $('format').value, deuce: $('deuce').value, first: +$('first').value });
+const names = () => ({ us: ['Us','Them'], ab: ['A','B'], custom: [$('n0').value || 'Team 1', $('n1').value || 'Team 2'] })[$('labels').value];
+
+const VARIANTS = {
+  A: { name: 'Halves — tap your half', dt: 'undo' },
+  B: { name: 'Scoreboard + buttons', dt: 'p0' },
+  C: { name: 'Focus score + Crown undo', dt: 'p0' },
+};
+const keys = Object.keys(VARIANTS);
+let variant = new URLSearchParams(location.search).get('variant');
+if (!VARIANTS[variant]) variant = 'A';
+
+const HAPTIC = { point: '.click', game: '.directionUp', set: '.success', match: '.notification', deciding: '.retry', undo: '.directionDown' };
+function haptic(kind) {
+  const line = `${kind.padEnd(9)}→ ${HAPTIC[kind]}`;
+  $('haptic').textContent = 'haptic ' + line;
+  const h = $('hlog'); h.textContent = line + '\n' + h.textContent.split('\n').slice(0, 30).join('\n');
+  const f = document.querySelector('.flash');
+  if (f) { f.style.background = kind === 'deciding' ? 'var(--gold)' : kind === 'undo' ? '#fff' : '#fff'; f.style.opacity = kind === 'point' ? .08 : .25; setTimeout(() => f.style.opacity = 0, 120); }
+}
+function toast(msg) { const t = document.querySelector('.toast'); if (!t) return; t.textContent = msg; t.style.opacity = 1; clearTimeout(toast.h); toast.h = setTimeout(() => t.style.opacity = 0, 1100); }
+
+function point(t) {
+  const before = replay(rules(), log);
+  if (before.winner !== null) return;
+  log.push(t);
+  const s = replay(rules(), log);
+  haptic(s.ev);
+  if (s.deciding) setTimeout(() => haptic('deciding'), 250);
+  render();
+}
+function undo() {
+  if (!log.length) return;
+  const who = names()[log.pop()]; haptic('undo');
+  render();
+  const s = replay(rules(), log);
+  toast(`Undone · point ${who} · ${s.ptLabel.join('–')}`);
+}
+function doubleTap() {
+  const b = $('dt').value || VARIANTS[variant].dt;
+  toast('Double Tap');
+  if (b === 'undo') undo(); else if (b === 'p0') point(0); else if (b === 'p1') point(1);
+}
+
+// ---------- variants ----------
+const setChips = s => s.sets.map(x => x.stb ? `STB ${x.g[0]}-${x.g[1]}` : `${x.g[0]}-${x.g[1]}`).join(' · ');
+const ball = '<span class="ball"></span>';
+
+function VariantA(s, n, inf) {
+  const half = t => `<div class="half zone fill ${t ? 'them' : 'us'}" data-act="p${t}">
+      ${s.serving === t ? `<span class="srv">${ball}</span>` : ''}
+      <div class="nm">${n[t]}</div><div class="pt">${s.ptLabel[t]}</div></div>`;
+  const mid = s.deciding ? `<b>${s.decidingName}</b>`
+    : `${s.tbName ? `<span class="chip">${s.tbName}</span>` : ''}<span class="gm">${s.games[1]}</span><span class="chip">${inf ? 'games' : 'games'}</span><span class="gm">${s.games[0]}</span>${!inf && s.sets.length ? `<span class="chip">${setChips(s)}</span>` : ''}`;
+  // team 2 on top (across the net), team 1 (wearer) at bottom
+  const u = $('aundo').value;
+  return `<div class="A">${u === 'bar' ? '<div class="topbar"></div>' : ''}${u === 'corner' || u === 'bar' ? '<div class="ucorner zone fill" data-act="undo">↶</div>' : ''}${half(1)}<div class="mid fill ${s.deciding ? 'deciding' : ''}">${u === 'strip' ? '<div class="ustrip zone fill" data-act="undo">↶</div>' : ''}${mid}</div>${half(0)}</div>`;
+}
+
+function VariantB(s, n, inf) {
+  const maxSets = inf ? 0 : Math.max(s.sets.length, 0);
+  const row = t => `<tr style="color:${t ? 'var(--them)' : 'var(--us)'}">
+      <td class="srv">${s.serving === t ? ball : ''}</td><td class="nm">${n[t]}</td>
+      ${s.sets.map(x => `<td class="s">${x.g[t]}</td>`).join('')}
+      <td class="g">${s.games[t]}</td><td class="p ${s.deciding ? 'deciding' : ''}"><span class="fill">${s.ptLabel[t]}</span></td></tr>`;
+  const tag = s.deciding ? `★ ${s.decidingName}` : s.tbName;
+  return `<div class="B"><div class="undo zone fill" data-act="undo">↶</div><div class="tag">${tag}</div>
+    <table>${row(0)}${row(1)}</table>
+    <div class="btns"><div class="btn us zone fill" data-act="p0"><span class="plus">+</span>${n[0]}</div>
+    <div class="btn them zone fill" data-act="p1"><span class="plus">+</span>${n[1]}</div></div></div>`;
+}
+
+let crownAcc = 0;
+function VariantC(s, n, inf) {
+  const dots = inf ? `<span>${s.games[0] + s.games[1]} games</span>` : s.sets.map(x => `<span>${x.g[0]}-${x.g[1]}</span>`).join('');
+  return `<div class="C ${s.deciding ? 'deciding' : ''}">
+    <div class="zones"><div class="zone" data-act="p0"></div><div class="zone" data-act="p1"></div></div>
+    <div class="dots">${dots}</div>
+    <div class="face">
+      <div class="names"><span style="color:var(--us)">${n[0]}</span><span style="color:var(--them)">${n[1]}</span></div>
+      <div class="big"><span>${s.ptLabel[0]}</span><span class="colon">:</span><span>${s.ptLabel[1]}</span></div>
+      <div class="srvrow"><span>${s.serving === 0 ? ball : ''}</span><span>${s.serving === 1 ? ball : ''}</span></div>
+      <div class="games"><span>${s.games[0]}</span><small>${s.tbName || 'GAMES'}</small><span>${s.games[1]}</span></div>
+    </div>
+    ${s.deciding ? `<div class="flag">${s.decidingName}</div>` : ''}
+    <div class="crownhint"><i style="height:${Math.min(100, crownAcc)}%"></i></div></div>`;
+}
+
+// ---------- render ----------
+const SIZES = { 41: [176, 215], 45: [198, 242] }; // points
+const SCALE = 2;
+function render() {
+  const s = replay(rules(), log), n = names(), inf = rules().format === 'infinite';
+  const [w, h] = SIZES[$('size').value];
+  const scr = $('screen');
+  scr.style.width = w + 'px'; scr.style.height = h + 'px';
+  $('scaler').style.transform = `scale(${SCALE})`;
+  $('scaler').style.width = w * SCALE + 'px'; $('scaler').style.height = h * SCALE + 'px';
+  scr.classList.toggle('aod', $('aod').checked);
+  let body = { A: VariantA, B: VariantB, C: VariantC }[variant](s, n, inf);
+  if (s.winner !== null) body += `<div class="decided"><b>${n[s.winner]} win${$('labels').value === 'us' && s.winner === 0 ? '' : 's'}</b>
+      <div class="sc">${setChips(s)}</div><div class="u zone" data-act="undo">↶ Undo</div></div>`;
+  scr.innerHTML = `<div class="clock">10:09</div>${body}<div class="flash"></div><div class="toast"></div>`;
+  const v = VARIANTS[variant];
+  const dtb = $('dt').value || v.dt;
+  $('vlabel').textContent = `${variant} — ${v.name}  ·  Double Tap: ${{ undo: 'undo', p0: '+' + n[0], p1: '+' + n[1], none: '—' }[dtb]}`;
+  $('customRow').style.display = $('labels').value === 'custom' ? 'flex' : 'none';
+}
+
+// ---------- input ----------
+$('screen').addEventListener('click', e => {
+  const z = e.target.closest('[data-act]'); if (!z) return;
+  const a = z.dataset.act;
+  if (a === 'undo') undo(); else point(+a.slice(1));
+});
+$('case').addEventListener('wheel', e => {
+  e.preventDefault();
+  if (variant !== 'C') { toast('Crown: unbound'); return; }
+  // turning "back" (scroll up) builds toward an undo; one detent-ish threshold
+  crownAcc = Math.max(0, crownAcc + (e.deltaY < 0 ? Math.abs(e.deltaY) / 3 : -Math.abs(e.deltaY) / 3));
+  if (crownAcc >= 100) { crownAcc = 0; undo(); return; }
+  const i = document.querySelector('.crownhint i'); if (i) i.style.height = crownAcc + '%';
+  clearTimeout(render.decay); render.decay = setTimeout(() => { crownAcc = 0; const i = document.querySelector('.crownhint i'); if (i) i.style.height = '0'; }, 700);
+}, { passive: false });
+function setVariant(v) { variant = v; const u = new URL(location); u.searchParams.set('variant', v); history.replaceState(null, '', u); render(); }
+const cycle = d => setVariant(keys[(keys.indexOf(variant) + d + keys.length) % keys.length]);
+$('prev').onclick = () => cycle(-1); $('next').onclick = () => cycle(1);
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea,select,[contenteditable]')) return;
+  if (e.key === 'ArrowLeft') cycle(-1); else if (e.key === 'ArrowRight') cycle(1);
+  else if (e.key === 'd' || e.key === 'D') doubleTap(); else if (e.key === 'z') undo();
+});
+document.querySelectorAll('aside select, aside input').forEach(el => el.addEventListener('input', render));
+
+// ---------- scenarios ----------
+const game = t => [t, t, t, t];
+const gamesAlt = n => Array.from({ length: n }, (_, i) => game(i % 2)).flat();
+document.querySelectorAll('[data-scn]').forEach(b => b.onclick = () => {
+  const pro = rules().format.startsWith('pro');
+  const set = t => Array.from({ length: pro ? 9 : 6 }, () => game(t)).flat();
+  log = {
+    reset: [],
+    deuce: [0,1,0,1,0,1],
+    tb: gamesAlt(pro ? 16 : 12),
+    mid: [...gamesAlt(8), ...game(0), ...game(0), ...gamesAlt(4), ...game(0), 0, 0, 1],
+    mp: [...set(0), ...gamesAlt(10), ...game(0), 0, 0, 0],
+  }[b.dataset.scn];
+  $('hlog').textContent = ''; $('haptic').textContent = '';
+  render();
+});
+render();
+</script>
+</body>
+</html>
