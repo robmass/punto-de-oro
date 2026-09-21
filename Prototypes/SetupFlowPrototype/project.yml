@@ -1,0 +1,22 @@
+# PROTOTYPE — throwaway. Setup flow design (wayfinder ticket "Setup flow design").
+name: SetupFlowPrototype
+options:
+  bundleIdPrefix: dev.robmass.prototype
+  deploymentTarget:
+    watchOS: "26.0"
+targets:
+  SetupFlowPrototype:
+    type: application
+    platform: watchOS
+    sources: [Sources]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.robmass.prototype.setupflow
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: "PdO Setup Proto"
+        INFOPLIST_KEY_WKWatchOnly: YES
+        INFOPLIST_KEY_WKApplication: YES
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        CODE_SIGN_STYLE: Automatic
