@@ -77,7 +77,7 @@ A Match with no Sets, only a running count of Games, which ends only when the pl
 _Avoid_: Timed match, open match
 
 **Decided**:
-A Match whose winning Point has been played, or an Infinite match the players have stopped; it still shows its summary and can be reopened by Undo.
+A Match whose winning Point has been played, an Infinite match the players have stopped, or a Match Ended early and saved; it still shows its summary and can be reopened by Undo (or Resume, when stopped or Ended early).
 _Avoid_: Over, done
 
 **Finished**:
@@ -85,9 +85,27 @@ A Decided Match whose summary the players have left; final, and no longer affect
 _Avoid_: Closed, archived, saved
 
 **Result**:
-The final outcome of a Match: the winning Team, or a Draw. In an Infinite match it counts completed Games only; the unfinished Game is ignored.
+The final outcome of a Match: the winning Team, a Draw, or Unfinished. In an Infinite match it counts completed Games only; the unfinished Game is ignored.
 _Avoid_: Outcome, final score
 
 **Draw**:
 A Result with no winner, possible only in an Infinite match when the counts of completed Games are level.
 _Avoid_: Tie (clashes with Tie-break)
+
+**Unfinished**:
+A Result with no winner, given to a set-based Match that was Ended early and saved; the summary shows the score exactly as it stood.
+_Avoid_: Incomplete, abandoned (abandoning discards the Match)
+
+### Lifecycle
+
+**End match**:
+The players' request to stop a Match before it is Decided; confirmed as Save (the Match becomes Decided) or Discard (the Match is Abandoned). With an empty Point log it Abandons silently.
+_Avoid_: Stop, quit
+
+**Abandoned**:
+A Match thrown away through End match → Discard: its workout is discarded and it leaves no record or summary.
+_Avoid_: Cancelled, deleted
+
+**Resume**:
+Reopening a Decided Match that was stopped or Ended early, so play continues from the same Point log and workout.
+_Avoid_: Restart, continue
