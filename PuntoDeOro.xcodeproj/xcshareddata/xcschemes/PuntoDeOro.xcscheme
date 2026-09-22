@@ -21,20 +21,6 @@
                ReferencedContainer = "container:PuntoDeOro.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "12487AAE266BE511E173F050"
-               BuildableName = "PuntoDeOroTests.xctest"
-               BlueprintName = "PuntoDeOroTests"
-               ReferencedContainer = "container:PuntoDeOro.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

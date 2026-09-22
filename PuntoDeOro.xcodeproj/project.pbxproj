@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		4423906D661029CE7906CE73 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0BBBB9AEC9A390C652FF8EF /* ContentView.swift */; };
-		4F6E70D9F167D04F1587C445 /* SkeletonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E57509D5116187AF3777EED9 /* SkeletonTests.swift */; };
 		A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */; };
+		F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,11 +23,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBundleTests.swift; sourceTree = "<group>"; };
 		272BC41A9E13527403A0F030 /* PuntoDeOro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PuntoDeOro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
 		C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuntoDeOroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0BBBB9AEC9A390C652FF8EF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		E57509D5116187AF3777EED9 /* SkeletonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -43,7 +43,7 @@
 		0CBB8E1C0BF8073691F8801B /* PuntoDeOroTests */ = {
 			isa = PBXGroup;
 			children = (
-				E57509D5116187AF3777EED9 /* SkeletonTests.swift */,
+				1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */,
 			);
 			path = PuntoDeOroTests;
 			sourceTree = "<group>";
@@ -148,7 +148,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4F6E70D9F167D04F1587C445 /* SkeletonTests.swift in Sources */,
+				F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,9 +277,8 @@
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.robmass.PuntoDeOro;
-				PRODUCT_NAME = PuntoDeOro;
 				SDKROOT = watchos;
-				SKIP_INSTALL = NO;
+				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Release;
@@ -360,9 +359,8 @@
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.robmass.PuntoDeOro;
-				PRODUCT_NAME = PuntoDeOro;
 				SDKROOT = watchos;
-				SKIP_INSTALL = NO;
+				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
 			};
 			name = Debug;
