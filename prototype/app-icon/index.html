@@ -4,6 +4,9 @@
   Four icon concepts, switchable via ?variant=A|B|C|D, each shown as:
   app icon at watch sizes · home-screen grid with the name · complication
   (full colour / monochrome / tinted / corner) · the accent in the app.
+  Toggles: accent policy, complication glyph, Home Screen name.
+  Winner: B (the court). ?variant=B-thin holds B's original stroke weights,
+  kept only to compare against the thickened B at 44pt.
   Run: bun prototype/app-icon/index.html
 -->
 <meta charset="utf-8">
@@ -78,6 +81,12 @@
     <select id="accent">
       <option value="gold-everywhere">Gold is the app accent (used everywhere)</option>
       <option value="gold-reserved" selected>Gold reserved for the deciding point</option>
+    </select>
+  </label>
+  <label>Complication glyph
+    <select id="gl">
+      <option value="main">Reduce the whole icon (court + net + ball)</option>
+      <option value="alt">The ball alone (filled circle)</option>
     </select>
   </label>
   <label>Home Screen name
@@ -180,7 +189,23 @@ const V = {
   },
   B: {
     name: 'B — The court',
-    desc: 'A padel court seen from above: the glass box, the net, the service lines, with the ball on court in gold. Says <b>padel</b>, not generic racket sport, and the blue gives the app an accent that is not gold — leaving gold exceptional. Risk: five lines and a dot is a lot for 44pt, and the glyph is a rectangle with a line through it.',
+    desc: 'A padel court seen from above: the glass box, the net, the service lines, with the ball on court in gold. Says <b>padel</b>, not generic racket sport, and the blue gives the app an accent that is not gold. <b>Refined after selection:</b> the centre service line is gone and every stroke is thickened, so nothing falls under ~2px at 44pt — compare the 44pt rendering against <b>B-thin</b>, the original.',
+    accent: 'var(--court)',
+    icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0b2a5c"/>
+      <rect x="20" y="13" width="60" height="74" rx="4" fill="#1f6feb"/>
+      <rect x="20" y="13" width="60" height="74" rx="4" fill="none" stroke="#eaf2ff" stroke-width="5"/>
+      <line x1="20" y1="50" x2="80" y2="50" stroke="#eaf2ff" stroke-width="6"/>
+      <line x1="20" y1="27" x2="80" y2="27" stroke="#eaf2ff" stroke-width="3.5"/>
+      <line x1="20" y1="73" x2="80" y2="73" stroke="#eaf2ff" stroke-width="3.5"/>
+      <circle cx="64" cy="62" r="9" fill="#ffcc00"/></svg>`,
+    glyph: `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7">
+      <rect x="22" y="16" width="56" height="68" rx="5"/><line x1="22" y1="50" x2="78" y2="50"/>
+      <circle cx="63" cy="65" r="7" fill="currentColor" stroke="none"/></svg>`,
+    glyphAlt: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="30"/></svg>`,
+  },
+  'B-thin': {
+    name: 'B-thin — The court (original strokes)',
+    desc: 'The court as first drawn: centre service line present, strokes at 2–3 units. Kept only so the 44pt rendering can be compared with the refined <b>B</b>. Not a candidate.',
     accent: 'var(--court)',
     icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0b2a5c"/>
       <rect x="22" y="14" width="56" height="72" rx="3" fill="#1f6feb"/>
@@ -229,7 +254,8 @@ const KEYS = Object.keys(V);
 
 // --- render -----------------------------------------------------------------
 const qs = new URLSearchParams(location.search);
-let cur = KEYS.includes((qs.get('variant')||'').toUpperCase()) ? qs.get('variant').toUpperCase() : 'A';
+const norm = q => KEYS.find(k => k.toLowerCase() === (q||'').toLowerCase());
+let cur = norm(qs.get('variant')) || 'A';
 
 function gridDots(hostIcon, name) {
   const g = document.getElementById('grid');
@@ -249,12 +275,13 @@ function render() {
   document.getElementById('vdesc').innerHTML = v.desc;
   document.getElementById('lbl').textContent = v.name;
   for (const id of ['i172','i80','i44']) document.getElementById(id).innerHTML = v.icon;
-  for (const [id, cls] of [['fFull',''],['fMono',''],['fTint','']]) {
+  const glyph = (document.getElementById('gl').value === 'alt' && v.glyphAlt) ? v.glyphAlt : v.glyph;
+  for (const id of ['fFull','fMono','fTint']) {
     document.getElementById(id).innerHTML = (id === 'fFull')
       ? `<span style="width:70px;height:70px;display:block;border-radius:50%;overflow:hidden">${v.icon}</span>`
-      : `<span style="width:56px;height:56px;display:block">${v.glyph}</span>`;
+      : `<span style="width:56px;height:56px;display:block">${glyph}</span>`;
   }
-  document.getElementById('fCorner').innerHTML = v.glyph;
+  document.getElementById('fCorner').innerHTML = glyph;
 
   const accentPolicy = document.getElementById('accent').value;
   const accent = accentPolicy === 'gold-everywhere' ? 'var(--gold)' : v.accent;
@@ -279,6 +306,7 @@ document.getElementById('prev').onclick = () => step(-1);
 document.getElementById('next').onclick = () => step(1);
 document.getElementById('accent').onchange = render;
 document.getElementById('nm').onchange = render;
+document.getElementById('gl').onchange = render;
 addEventListener('keydown', e => {
   if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   if (e.key === 'ArrowLeft') step(-1);
