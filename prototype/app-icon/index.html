@@ -1,0 +1,288 @@
+<!doctype html>
+<!--
+  THROWAWAY PROTOTYPE — App icon and visual identity (#11). Not for main.
+  Four icon concepts, switchable via ?variant=A|B|C|D, each shown as:
+  app icon at watch sizes · home-screen grid with the name · complication
+  (full colour / monochrome / tinted / corner) · the accent in the app.
+  Run: bun prototype/app-icon/index.html
+-->
+<meta charset="utf-8">
+<title>Punto de Oro — icon prototype</title>
+<style>
+  :root {
+    --gold:#ffcc00; --us:#30d158; --them:#ff9f0a; --ball:#d4ff3a;
+    --bg:#000; --panel:#141416; --fg:#f2f2f7; --mut:#8e8e93; --line:#2c2c2e;
+    --court:#1f6feb; --tint:#7dd3fc;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#0b0b0c; color:var(--fg); font:14px -apple-system,"SF Pro Text",system-ui,sans-serif; padding:24px 24px 110px; }
+  h1 { font-size:17px; margin:0 0 2px; }
+  h2 { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--mut); margin:0 0 12px; font-weight:600; }
+  .sub { color:var(--mut); margin:0 0 20px; max-width:760px; line-height:1.5; }
+  .sub b { color:var(--fg); }
+  .rows { display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .cap { color:var(--mut); font-size:11px; text-align:center; margin-top:8px; }
+  .icons { display:flex; align-items:flex-end; gap:20px; }
+  .ico { border-radius:50%; overflow:hidden; display:block; background:#000; }
+
+  /* home screen grid */
+  .grid { position:relative; width:240px; height:240px; background:#000; border-radius:26px; overflow:hidden; }
+  .grid .dot { position:absolute; border-radius:50%; background:#2a2a2c; transform:translate(-50%,-50%); }
+  .grid .me { position:absolute; transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; }
+  .grid .name { position:absolute; left:0; right:0; text-align:center; font-size:11px; font-weight:600;
+                white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 18px; }
+
+  /* complication slots */
+  .slots { display:flex; gap:18px; align-items:flex-start; }
+  .face { width:96px; height:96px; border-radius:50%; display:grid; place-items:center; background:#000;
+          box-shadow:inset 0 0 0 1px #222; }
+  .face.mono { color:#fff; } .face.tinted { color:var(--tint); }
+  .corner { width:120px; height:120px; background:#000; border-radius:0 0 0 118px; position:relative; box-shadow:inset 0 0 0 1px #222; }
+  .corner .g { position:absolute; left:10px; top:10px; width:34px; height:34px; color:#fff; }
+
+  /* watch screen mocks */
+  .screen { width:184px; height:224px; background:#000; border-radius:34px; padding:10px; display:flex; flex-direction:column; gap:6px;
+            box-shadow:0 0 0 3px #3a3a3c; }
+  .bar { height:16px; display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--mut); }
+  .half { flex:1; border-radius:8px; display:grid; place-items:center; font-size:30px; font-weight:700; }
+  .half.us { background:#0f3d1c; color:var(--us); } .half.them { background:#4a2e05; color:var(--them); }
+  .strip { height:26px; border-radius:5px; background:#1c1c1e; display:grid; place-items:center;
+           font-size:10px; font-weight:800; letter-spacing:.06em; }
+  .strip.deciding { background:var(--gold); color:#000; }
+  .setup { width:184px; height:224px; background:#000; border-radius:34px; padding:12px 10px; box-shadow:0 0 0 3px #3a3a3c; }
+  .setup .t { font-size:11px; color:var(--mut); margin-bottom:8px; }
+  .setup .row { background:#1c1c1e; border-radius:8px; padding:8px 10px; font-size:12px; margin-bottom:6px; display:flex; justify-content:space-between; }
+  .setup .row.sel { outline:2px solid var(--accent); color:var(--accent); }
+  .setup .go { background:var(--accent); color:#000; border-radius:8px; padding:8px; text-align:center; font-weight:700; font-size:13px; margin-top:10px; }
+
+  /* switcher */
+  .switcher { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); display:flex; align-items:center; gap:10px;
+              background:#fff; color:#000; border-radius:999px; padding:8px 12px; box-shadow:0 8px 30px #000a; z-index:9; }
+  .switcher button { border:0; background:#eee; border-radius:999px; width:28px; height:28px; font-size:15px; cursor:pointer; }
+  .switcher .lbl { font-weight:700; font-size:13px; min-width:230px; text-align:center; }
+  .ctl { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0 0 18px; }
+  .ctl label { font-size:12px; color:var(--mut); }
+  select { background:#2c2c2e; color:var(--fg); border:0; border-radius:6px; padding:5px 7px; font:inherit; }
+  .compare { display:flex; gap:14px; margin-top:8px; }
+  .compare .c { text-align:center; cursor:pointer; opacity:.5; }
+  .compare .c.on { opacity:1; }
+  .compare .c div { font-size:10px; color:var(--mut); margin-top:4px; }
+</style>
+
+<h1>App icon and visual identity — <span id="vname"></span></h1>
+<p class="sub" id="vdesc"></p>
+
+<div class="ctl">
+  <label>Accent policy
+    <select id="accent">
+      <option value="gold-everywhere">Gold is the app accent (used everywhere)</option>
+      <option value="gold-reserved" selected>Gold reserved for the deciding point</option>
+    </select>
+  </label>
+  <label>Home Screen name
+    <select id="nm">
+      <option>Punto de Oro</option><option>Punto d’Oro</option><option>Punto</option><option>PdO</option><option>Oro</option>
+    </select>
+  </label>
+</div>
+
+<div class="rows">
+  <div class="card">
+    <h2>App icon</h2>
+    <div class="icons">
+      <div><span class="ico" id="i172" style="width:172px;height:172px"></span><div class="cap">172pt — App Store / settings</div></div>
+      <div><span class="ico" id="i80" style="width:80px;height:80px"></span><div class="cap">80pt — grid</div></div>
+      <div><span class="ico" id="i44" style="width:44px;height:44px"></span><div class="cap">44pt — notification</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Home Screen (grid view)</h2>
+    <div class="grid" id="grid"></div>
+    <div class="cap">Name shows only for the centred app; watchOS truncates.</div>
+  </div>
+</div>
+
+<div class="rows" style="margin-top:16px">
+  <div class="card">
+    <h2>Launcher complication (#9)</h2>
+    <div class="slots">
+      <div><div class="face" id="fFull"></div><div class="cap">circular · full colour</div></div>
+      <div><div class="face mono" id="fMono"></div><div class="cap">circular · monochrome</div></div>
+      <div><div class="face tinted" id="fTint"></div><div class="cap">circular · tinted face</div></div>
+      <div><div class="corner"><div class="g" id="fCorner"></div></div><div class="cap">corner · empty label</div></div>
+    </div>
+    <div class="cap" style="margin-top:12px">Tinted &amp; monochrome faces drop all colour — the glyph must read as a <b>shape</b>.</div>
+  </div>
+</div>
+
+<div class="rows" style="margin-top:16px">
+  <div class="card">
+    <h2>The accent inside the app</h2>
+    <div class="slots">
+      <div>
+        <div class="setup" id="setup">
+          <div class="t">Format</div>
+          <div class="row">3 sets</div>
+          <div class="row sel">2 sets + super TB</div>
+          <div class="row">Pro set</div>
+          <div class="go">Start</div>
+        </div>
+        <div class="cap">Setup wizard (#4)</div>
+      </div>
+      <div>
+        <div class="screen">
+          <div class="bar"><span>↶</span><span>10:09</span></div>
+          <div class="half them">30</div>
+          <div class="strip">4–3 · 1 SET</div>
+          <div class="half us">40</div>
+        </div>
+        <div class="cap">Live — ordinary point</div>
+      </div>
+      <div>
+        <div class="screen">
+          <div class="bar"><span>↶</span><span>10:09</span></div>
+          <div class="half them">40</div>
+          <div class="strip deciding">GOLDEN POINT</div>
+          <div class="half us">40</div>
+        </div>
+        <div class="cap">Live — deciding point (#5)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px; display:inline-block">
+  <h2>All four, side by side</h2>
+  <div class="compare" id="compare"></div>
+</div>
+
+<div class="switcher">
+  <button id="prev">←</button><div class="lbl" id="lbl"></div><button id="next">→</button>
+</div>
+
+<script>
+// --- the four concepts -------------------------------------------------------
+// icon(size) -> full-colour SVG markup;  glyph() -> shape-only SVG (currentColor)
+const V = {
+  A: {
+    name: 'A — The golden point',
+    desc: 'The literal reading of the name: one gold ball on black, nothing else. Maximum recognisability at 44pt and the only concept whose icon <b>is already</b> the complication glyph #9 assumed — a single filled circle. Risk: it is a dot; it says "ball", not "padel", and looks like a dozen other apps at a glance.',
+    accent: 'var(--gold)',
+    icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#000"/>
+      <circle cx="50" cy="50" r="27" fill="#ffcc00"/>
+      <circle cx="50" cy="50" r="27" fill="url(#shine)"/>
+      <defs><radialGradient id="shine" cx="38%" cy="32%" r="70%">
+        <stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient></defs></svg>`,
+    glyph: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="30"/></svg>`,
+  },
+  B: {
+    name: 'B — The court',
+    desc: 'A padel court seen from above: the glass box, the net, the service lines, with the ball on court in gold. Says <b>padel</b>, not generic racket sport, and the blue gives the app an accent that is not gold — leaving gold exceptional. Risk: five lines and a dot is a lot for 44pt, and the glyph is a rectangle with a line through it.',
+    accent: 'var(--court)',
+    icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0b2a5c"/>
+      <rect x="22" y="14" width="56" height="72" rx="3" fill="#1f6feb"/>
+      <rect x="22" y="14" width="56" height="72" rx="3" fill="none" stroke="#eaf2ff" stroke-width="3"/>
+      <line x1="22" y1="50" x2="78" y2="50" stroke="#eaf2ff" stroke-width="3.5"/>
+      <line x1="22" y1="28" x2="78" y2="28" stroke="#eaf2ff" stroke-width="2"/>
+      <line x1="22" y1="72" x2="78" y2="72" stroke="#eaf2ff" stroke-width="2"/>
+      <line x1="50" y1="28" x2="50" y2="72" stroke="#eaf2ff" stroke-width="2"/>
+      <circle cx="64" cy="62" r="7" fill="#ffcc00"/></svg>`,
+    glyph: `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">
+      <rect x="22" y="16" width="56" height="68" rx="4"/><line x1="22" y1="50" x2="78" y2="50"/>
+      <circle cx="63" cy="65" r="6" fill="currentColor" stroke="none"/></svg>`,
+  },
+  C: {
+    name: 'C — Forty–forty',
+    desc: 'The score at the moment the name refers to: <b>40</b> in white with the second digit struck in gold — the point that decides. Reads instantly to anyone who scores a match, and the numerals survive shrinking better than line art. Risk: it is typographic, so it competes with the numbers on the live screen, and localised score conventions differ.',
+    accent: 'var(--gold)',
+    icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#000"/>
+      <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
+        font-family="-apple-system,SF Pro Display,Helvetica,sans-serif" font-weight="800" font-size="46" letter-spacing="-2">
+        <tspan fill="#f2f2f7">4</tspan><tspan fill="#ffcc00">0</tspan></text></svg>`,
+    glyph: `<svg viewBox="0 0 100 100"><text x="50" y="52" text-anchor="middle" dominant-baseline="central"
+      font-family="-apple-system,SF Pro Display,Helvetica,sans-serif" font-weight="800" font-size="52" fill="currentColor">40</text></svg>`,
+  },
+  D: {
+    name: 'D — Ball over the net',
+    desc: 'The gold ball crossing a white net band: a moment rather than an object, and the only concept with real diagonal movement. Distinctive in the grid next to Apple’s flat glyphs, and the ball still carries the gold. Risk: two elements fighting for 44pt, and at complication size the net can read as noise.',
+    accent: 'var(--gold)',
+    icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#000"/>
+      <g stroke="#f2f2f7" stroke-width="2.4" opacity=".92">
+        <line x1="8" y1="64" x2="92" y2="64"/><line x1="8" y1="88" x2="92" y2="88"/>
+        <line x1="8" y1="64" x2="8" y2="88"/><line x1="26" y1="64" x2="26" y2="88"/>
+        <line x1="44" y1="64" x2="44" y2="88"/><line x1="62" y1="64" x2="62" y2="88"/>
+        <line x1="80" y1="64" x2="80" y2="88"/><line x1="92" y1="64" x2="92" y2="88"/>
+        <line x1="8" y1="76" x2="92" y2="76"/></g>
+      <circle cx="62" cy="36" r="17" fill="#ffcc00"/>
+      <path d="M20 58 Q40 18 62 36" stroke="#ffcc00" stroke-width="3" fill="none" opacity=".5" stroke-dasharray="5 6"/></svg>`,
+    glyph: `<svg viewBox="0 0 100 100"><g stroke="currentColor" stroke-width="5" fill="none">
+      <line x1="12" y1="70" x2="88" y2="70"/><line x1="12" y1="70" x2="12" y2="90"/>
+      <line x1="38" y1="70" x2="38" y2="90"/><line x1="62" y1="70" x2="62" y2="90"/><line x1="88" y1="70" x2="88" y2="90"/>
+      <line x1="12" y1="90" x2="88" y2="90"/></g>
+      <circle cx="58" cy="36" r="19" fill="currentColor"/></svg>`,
+  },
+};
+const KEYS = Object.keys(V);
+
+// --- render -----------------------------------------------------------------
+const qs = new URLSearchParams(location.search);
+let cur = KEYS.includes((qs.get('variant')||'').toUpperCase()) ? qs.get('variant').toUpperCase() : 'A';
+
+function gridDots(hostIcon, name) {
+  const g = document.getElementById('grid');
+  const cx = 120, cy = 112;
+  const ring = [[0,-64,30],[56,-32,30],[56,32,30],[0,64,30],[-56,32,30],[-56,-32,30],
+                [0,-108,18],[92,-54,18],[92,54,18],[0,108,18],[-92,54,18],[-92,-54,18],
+                [56,-96,16],[-56,-96,16],[56,96,16],[-56,96,16]];
+  g.innerHTML = ring.map(([x,y,r]) =>
+    `<div class="dot" style="left:${cx+x}px;top:${cy+y}px;width:${r*2}px;height:${r*2}px"></div>`).join('')
+    + `<div class="me" style="left:${cx}px;top:${cy}px;width:72px;height:72px">${hostIcon}</div>`
+    + `<div class="name" style="top:${cy+46}px">${name}</div>`;
+}
+
+function render() {
+  const v = V[cur];
+  document.getElementById('vname').textContent = v.name;
+  document.getElementById('vdesc').innerHTML = v.desc;
+  document.getElementById('lbl').textContent = v.name;
+  for (const id of ['i172','i80','i44']) document.getElementById(id).innerHTML = v.icon;
+  for (const [id, cls] of [['fFull',''],['fMono',''],['fTint','']]) {
+    document.getElementById(id).innerHTML = (id === 'fFull')
+      ? `<span style="width:70px;height:70px;display:block;border-radius:50%;overflow:hidden">${v.icon}</span>`
+      : `<span style="width:56px;height:56px;display:block">${v.glyph}</span>`;
+  }
+  document.getElementById('fCorner').innerHTML = v.glyph;
+
+  const accentPolicy = document.getElementById('accent').value;
+  const accent = accentPolicy === 'gold-everywhere' ? 'var(--gold)' : v.accent;
+  document.getElementById('setup').style.setProperty('--accent', accent);
+
+  gridDots(v.icon, document.getElementById('nm').value);
+
+  document.getElementById('compare').innerHTML = KEYS.map(k =>
+    `<div class="c ${k===cur?'on':''}" data-k="${k}">
+       <span style="width:56px;height:56px;display:block;border-radius:50%;overflow:hidden">${V[k].icon}</span>
+       <div>${k}</div></div>`).join('');
+  document.querySelectorAll('#compare .c').forEach(el =>
+    el.onclick = () => { cur = el.dataset.k; sync(); });
+
+  qs.set('variant', cur);
+  history.replaceState(null, '', '?' + qs.toString());
+}
+function sync(){ render(); }
+function step(d){ cur = KEYS[(KEYS.indexOf(cur) + d + KEYS.length) % KEYS.length]; sync(); }
+
+document.getElementById('prev').onclick = () => step(-1);
+document.getElementById('next').onclick = () => step(1);
+document.getElementById('accent').onchange = render;
+document.getElementById('nm').onchange = render;
+addEventListener('keydown', e => {
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowLeft') step(-1);
+  if (e.key === 'ArrowRight') step(1);
+});
+render();
+</script>
