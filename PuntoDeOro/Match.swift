@@ -25,7 +25,9 @@ struct Match {
     let rules = Rules()
     private(set) var points: [Point] = []
 
+    /// Once the Match is Decided, only Undo changes the Point log.
     mutating func scorePoint(for team: Team, at timestamp: Date = .now) {
+        guard !score.isDecided else { return }
         points.append(Point(winner: team, timestamp: timestamp))
     }
 
@@ -48,39 +50,74 @@ struct Match {
 struct Score {
     private let firstServer: Team
     private var pointsInGame = Tally()
-    private var gamesWon = Tally()
+    private var gamesInSet = Tally()
+    private var gamesPlayed = 0
+    /// The completed Sets, in the order they were played.
+    private(set) var sets: [SetScore] = []
+    /// The Team that won two Sets, once the Match is Decided.
+    private(set) var winner: Team?
+
+    var isDecided: Bool { winner != nil }
 
     fileprivate init(firstServer: Team) {
         self.firstServer = firstServer
     }
 
-    /// Serve alternates every Game.
+    /// Serve alternates every Game, so the Set after a Tie-break opens with the Team that did not
+    /// serve first in it. Inside a Tie-break, the Team due serves one Point, then serve changes
+    /// every two.
     var servingTeam: Team {
-        gamesWon.total.isMultiple(of: 2) ? firstServer : firstServer.opponent
+        let dueToServe = gamesPlayed.isMultiple(of: 2) ? firstServer : firstServer.opponent
+        guard isTieBreak else { return dueToServe }
+        return ((pointsInGame.total + 1) / 2).isMultiple(of: 2) ? dueToServe : dueToServe.opponent
     }
 
+    /// A Set level at 6–6 is decided by a Tie-break.
+    var isTieBreak: Bool { gamesInSet[.us] == 6 && gamesInSet[.them] == 6 }
+
     func points(_ team: Team) -> String {
+        if isTieBreak { return "\(pointsInGame[team])" }
         let own = pointsInGame[team], opponent = pointsInGame[team.opponent]
         if own >= 3 && opponent >= 3 { return own > opponent ? "AD" : "40" }
         return ["0", "15", "30", "40"][own]
     }
 
-    func games(_ team: Team) -> Int { gamesWon[team] }
+    /// Games in the Set being played.
+    func games(_ team: Team) -> Int { gamesInSet[team] }
 
     fileprivate mutating func record(_ winner: Team) {
+        let pointsToWinGame = isTieBreak ? 7 : 4
         pointsInGame[winner] += 1
-        if pointsInGame[winner] >= 4 && pointsInGame[winner] - pointsInGame[winner.opponent] >= 2 {
-            gamesWon[winner] += 1
-            pointsInGame = Tally()
-        }
+        guard pointsInGame.hasWon(winner, reaching: pointsToWinGame) else { return }
+        pointsInGame = Tally()
+        gamesInSet[winner] += 1
+        gamesPlayed += 1
+        guard gamesInSet.hasWon(winner, reaching: 6) || gamesInSet[winner] == 7 else { return }
+        sets.append(SetScore(games: gamesInSet))
+        gamesInSet = Tally()
+        if sets.count(where: { $0.winner == winner }) == 2 { self.winner = winner }
     }
 }
 
+/// The Games each Team won in a completed Set.
+struct SetScore {
+    fileprivate let games: Tally
+
+    func games(_ team: Team) -> Int { games[team] }
+
+    var winner: Team { games[.us] > games[.them] ? .us : .them }
+}
+
 /// A count kept for each Team.
-private struct Tally {
+fileprivate struct Tally {
     private var us = 0, them = 0
 
     var total: Int { us + them }
+
+    /// Whether this Team has reached the target with a lead of two.
+    func hasWon(_ team: Team, reaching target: Int) -> Bool {
+        self[team] >= target && self[team] - self[team.opponent] >= 2
+    }
 
     subscript(team: Team) -> Int {
         get { team == .us ? us : them }

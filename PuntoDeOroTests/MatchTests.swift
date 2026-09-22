@@ -75,6 +75,114 @@ struct MatchTests {
         var match = Match(pointsWonBy: [.us, .us, .them, .them])
         #expect(match.undo() == "Undone · point Them · 30–15")
     }
+
+    @Test func aSetIsWonByTheFirstTeamToSixGamesWithATwoGameLead() {
+        let fiveAll = gamesToLove(.us, 5) + gamesToLove(.them, 5)
+        #expect(Match(pointsWonBy: fiveAll + gamesToLove(.us, 1)).score.sets.isEmpty)
+
+        let score = Match(pointsWonBy: fiveAll + gamesToLove(.us, 2)).score
+        #expect(score.setScores == [[7, 5]])
+        #expect(score.games(.us) == 0)
+        #expect(score.games(.them) == 0)
+    }
+
+    @Test func atSixAllATieBreakIsPlayedToSevenWinByTwoAndTheSetIsRecordedSevenSix() {
+        #expect(Match(pointsWonBy: sixAll).score.isTieBreak)
+
+        let threeTwo = Match(pointsWonBy: sixAll + [.us, .them, .us, .them, .us]).score
+        #expect(threeTwo.points(.us) == "3")
+        #expect(threeTwo.points(.them) == "2")
+
+        let sixAllInTheTieBreak = sixAll + Array(repeating: .us, count: 6) + Array(repeating: .them, count: 6)
+        let sevenSix = Match(pointsWonBy: sixAllInTheTieBreak + [.them]).score
+        #expect(sevenSix.isTieBreak)
+        #expect(sevenSix.points(.them) == "7")
+        #expect(sevenSix.sets.isEmpty)
+
+        let won = Match(pointsWonBy: sixAllInTheTieBreak + [.them, .us, .them, .them]).score
+        #expect(!won.isTieBreak)
+        #expect(won.setScores == [[6, 7]])
+    }
+
+    @Test func inATieBreakTheTeamDueServesOnePointThenServeChangesEveryTwo() {
+        let servers = (0..<6).map { played in
+            Match(pointsWonBy: sixAll + Array(repeating: .them, count: played)).score.servingTeam
+        }
+        #expect(servers == [.us, .them, .them, .us, .us, .them])
+    }
+
+    @Test func theNextSetIsServedFirstByTheTeamThatDidNotServeFirstInTheTieBreak() {
+        #expect(Match(pointsWonBy: sixAll).score.servingTeam == .us)
+
+        let nextSet = Match(pointsWonBy: sixAll + Array(repeating: .us, count: 7)).score
+        #expect(nextSet.sets.count == 1)
+        #expect(nextSet.servingTeam == .them)
+    }
+
+    @Test func winningTwoSetsDecidesTheMatch() {
+        let firstSetInATieBreak = sixAll + [.them, .us, .us, .us, .them, .us, .them, .them, .us, .them, .us, .us]
+        let thirdSet = gamesToLove(.them, 3) + gamesToLove(.us, 6)
+        let log = firstSetInATieBreak + gamesToLove(.them, 6) + thirdSet
+
+        let beforeMatchPoint = Match(pointsWonBy: log.dropLast())
+        #expect(!beforeMatchPoint.score.isDecided)
+
+        let decided = Match(pointsWonBy: log).score
+        #expect(decided.isDecided)
+        #expect(decided.winner == .us)
+        #expect(decided.setScores == [[7, 6], [0, 6], [6, 3]])
+    }
+
+    @Test func aDecidedMatchTakesNoMorePoints() {
+        var match = Match(pointsWonBy: gamesToLove(.them, 12))
+        #expect(match.score.isDecided)
+
+        match.scorePoint(for: .us)
+
+        #expect(match.points.count == 48)
+        #expect(match.score.points(.us) == "0")
+    }
+
+    @Test func undoRewindsAcrossSetAndTieBreakBoundariesServeIncluded() {
+        var match = Match(pointsWonBy: sixAll + [.them, .them, .them, .them, .them, .them, .them])
+        #expect(match.score.sets.count == 1)
+        #expect(match.score.servingTeam == .them)
+
+        match.undo()
+
+        let score = match.score
+        #expect(score.sets.isEmpty)
+        #expect(score.isTieBreak)
+        #expect(score.points(.them) == "6")
+        #expect(score.points(.us) == "0")
+        #expect(score.servingTeam == .them)
+        #expect(score.games(.us) == 6)
+    }
+
+    @Test func undoReopensADecidedMatch() {
+        var match = Match(pointsWonBy: gamesToLove(.them, 12))
+        match.undo()
+
+        let score = match.score
+        #expect(!score.isDecided)
+        #expect(score.sets.count == 1)
+        #expect(score.games(.them) == 5)
+        #expect(score.points(.them) == "40")
+        #expect(score.servingTeam == .them)
+    }
+}
+
+/// The Points that win this many Games in a row to love.
+private func gamesToLove(_ team: Team, _ count: Int) -> [Team] {
+    Array(repeating: team, count: 4 * count)
+}
+
+/// The Points that bring the first Set level at 6–6, with Us due to serve the Tie-break.
+private let sixAll = gamesToLove(.us, 5) + gamesToLove(.them, 6) + gamesToLove(.us, 1)
+
+extension Score {
+    /// The completed Sets as [Us, Them] Games.
+    var setScores: [[Int]] { sets.map { [$0.games(.us), $0.games(.them)] } }
 }
 
 extension Match {

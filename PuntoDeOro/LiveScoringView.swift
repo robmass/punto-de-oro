@@ -71,16 +71,39 @@ struct LiveScoringView: View {
         .onTapGesture { match.scorePoint(for: team) }
     }
 
-    /// The dead band: no gesture, so a tap here does nothing.
+    /// The dead band: no gesture, so a tap here does nothing. Completed Sets read left to right,
+    /// then the Games of the Set being played.
     private func strip(_ score: Score) -> some View {
-        VStack(spacing: -2) {
-            Text("\(score.games(.them))").foregroundStyle(Team.them.color)
-            Text("\(score.games(.us))").foregroundStyle(Team.us.color)
+        HStack(spacing: 10) {
+            ForEach(score.sets.indices, id: \.self) { index in
+                gamesColumn(score.sets[index].games)
+                    .opacity(0.6)
+            }
+            if !score.isDecided {
+                gamesColumn(score.games)
+            }
+            if let status = statusLabel(score) {
+                Text(status).font(.system(size: 11, weight: .bold))
+            }
         }
         .font(.system(size: 15, weight: .semibold).monospacedDigit())
         .frame(maxWidth: .infinity)
         .frame(height: Self.stripHeight)
         .background(Palette.strip, ignoresSafeAreaEdges: [])
+    }
+
+    private func gamesColumn(_ games: (Team) -> Int) -> some View {
+        VStack(spacing: -2) {
+            Text("\(games(.them))").foregroundStyle(Team.them.color)
+            Text("\(games(.us))").foregroundStyle(Team.us.color)
+        }
+    }
+
+    /// `TIE-BREAK` while one is played. Once the Match is Decided, a placeholder names the winner
+    /// until the summary screen lands.
+    private func statusLabel(_ score: Score) -> String? {
+        if let winner = score.winner { return "\(winner.name.uppercased()) WIN" }
+        return score.isTieBreak ? "TIE-BREAK" : nil
     }
 
     @ViewBuilder
