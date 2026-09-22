@@ -1,0 +1,50 @@
+name: PuntoDeOro
+options:
+  bundleIdPrefix: com.robmass
+  deploymentTarget:
+    watchOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: PYTG8F6332
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  PuntoDeOro:
+    type: application
+    platform: watchOS
+    sources:
+      - PuntoDeOro
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.robmass.PuntoDeOro
+        PRODUCT_NAME: PuntoDeOro
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Punto de Oro
+        INFOPLIST_KEY_WKWatchOnly: YES
+        INFOPLIST_KEY_WKApplication: YES
+        SKIP_INSTALL: NO
+  PuntoDeOroTests:
+    type: bundle.unit-test
+    platform: watchOS
+    sources:
+      - PuntoDeOroTests
+    dependencies:
+      - target: PuntoDeOro
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.robmass.PuntoDeOroTests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/PuntoDeOro.app/PuntoDeOro"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  PuntoDeOro:
+    build:
+      targets:
+        PuntoDeOro: all
+        PuntoDeOroTests: [test]
+    test:
+      targets:
+        - PuntoDeOroTests
