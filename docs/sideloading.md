@@ -31,14 +31,23 @@ xcrun devicectl device process launch --device <udid> com.robmass.PuntoDeOro
 
 ## Tests
 
+Run the tests on the Series 9 (45mm) simulator, which needs no watch:
+
 ```sh
 xcodebuild test -project PuntoDeOro.xcodeproj -scheme PuntoDeOro \
-  -destination 'platform=watchOS,id=<udid>' -derivedDataPath build -allowProvisioningUpdates
+  -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm)' -derivedDataPath build
 ```
 
-Or use `-destination 'platform=watchOS Simulator,name=<watch>'` once a watchOS simulator
-runtime is installed (`xcodebuild -downloadPlatform watchOS`).
+One-time setup, if the simulator is missing:
 
-The watch must be **unlocked with its screen on**. Otherwise launching the app or the test
-runner fails with *"Navigation away from clock is not allowed due to one or more active
-system states"*.
+```sh
+xcodebuild -downloadPlatform watchOS
+xcrun simctl create "Apple Watch Series 9 (45mm)" \
+  com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-9-45mm \
+  com.apple.CoreSimulator.SimRuntime.watchOS-27-0
+```
+
+To run them on the watch instead, use `-destination 'platform=watchOS,id=<udid>'` and add
+`-allowProvisioningUpdates`. The watch must be **unlocked with its screen on**. Otherwise
+launching the app or the test runner fails with *"Navigation away from clock is not allowed
+due to one or more active system states"*.

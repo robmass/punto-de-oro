@@ -14,4 +14,4 @@ The Xcode project is generated from [`project.yml`](project.yml) by
 committed, so a clean checkout builds without XcodeGen. After editing `project.yml`, run
 `xcodegen generate` and commit both files.
 
-[`docs/sideloading.md`](docs/sideloading.md) covers installing onto the watch and running the tests.
+[`docs/sideloading.md`](docs/sideloading.md) covers installing onto the watch and running the tests (on the simulator by default).
