@@ -5,8 +5,8 @@
   app icon at watch sizes · home-screen grid with the name · complication
   (full colour / monochrome / tinted / corner) · the accent in the app.
   Toggles: accent policy, complication glyph, Home Screen name.
-  Winner: B (the court). ?variant=B-thin holds B's original stroke weights,
-  kept only to compare against the thickened B at 44pt.
+  Winner: B (the court), at its original stroke weights. ?variant=B-heavy holds a
+  thickened redraw that was tested and rejected — see renders/ for the pixel evidence.
   Run: bun prototype/app-icon/index.html
 -->
 <meta charset="utf-8">
@@ -189,7 +189,24 @@ const V = {
   },
   B: {
     name: 'B — The court',
-    desc: 'A padel court seen from above: the glass box, the net, the service lines, with the ball on court in gold. Says <b>padel</b>, not generic racket sport, and the blue gives the app an accent that is not gold. <b>Refined after selection:</b> the centre service line is gone and every stroke is thickened, so nothing falls under ~2px at 44pt — compare the 44pt rendering against <b>B-thin</b>, the original.',
+    desc: 'A padel court seen from above: the glass box, the net, the service lines, with the ball on court in gold. Says <b>padel</b>, not generic racket sport. <b>Strokes as first drawn</b> — a thickened version was tested and rejected (see <b>B-heavy</b> and <code>renders/</code>): the original survives 48px intact, and the centre service line is the only vertical structure holding the shape together.',
+    accent: 'var(--court)',
+    icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0b2a5c"/>
+      <rect x="22" y="14" width="56" height="72" rx="3" fill="#1f6feb"/>
+      <rect x="22" y="14" width="56" height="72" rx="3" fill="none" stroke="#eaf2ff" stroke-width="3"/>
+      <line x1="22" y1="50" x2="78" y2="50" stroke="#eaf2ff" stroke-width="3.5"/>
+      <line x1="22" y1="28" x2="78" y2="28" stroke="#eaf2ff" stroke-width="2"/>
+      <line x1="22" y1="72" x2="78" y2="72" stroke="#eaf2ff" stroke-width="2"/>
+      <line x1="50" y1="28" x2="50" y2="72" stroke="#eaf2ff" stroke-width="2"/>
+      <circle cx="64" cy="62" r="7" fill="#ffcc00"/></svg>`,
+    glyph: `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7">
+      <rect x="22" y="16" width="56" height="68" rx="5"/><line x1="22" y1="50" x2="78" y2="50"/>
+      <circle cx="63" cy="65" r="7" fill="currentColor" stroke="none"/></svg>`,
+    glyphAlt: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="30"/></svg>`,
+  },
+  'B-heavy': {
+    name: 'B-heavy — The court (thickened, REJECTED)',
+    desc: 'The court with the centre service line dropped and every stroke thickened, on the claim that the original would blur at small sizes. <b>Rejected:</b> the claim was wrong (2 units on a 100-unit canvas is ~1.8 physical px at 44pt on a 2× display, not sub-pixel), and the change costs the shape — with no vertical line and fattened strokes eating the blue, it reads as a striped ladder. Kept as the record of a bad refinement.',
     accent: 'var(--court)',
     icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0b2a5c"/>
       <rect x="20" y="13" width="60" height="74" rx="4" fill="#1f6feb"/>
@@ -201,23 +218,6 @@ const V = {
     glyph: `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7">
       <rect x="22" y="16" width="56" height="68" rx="5"/><line x1="22" y1="50" x2="78" y2="50"/>
       <circle cx="63" cy="65" r="7" fill="currentColor" stroke="none"/></svg>`,
-    glyphAlt: `<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="30"/></svg>`,
-  },
-  'B-thin': {
-    name: 'B-thin — The court (original strokes)',
-    desc: 'The court as first drawn: centre service line present, strokes at 2–3 units. Kept only so the 44pt rendering can be compared with the refined <b>B</b>. Not a candidate.',
-    accent: 'var(--court)',
-    icon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0b2a5c"/>
-      <rect x="22" y="14" width="56" height="72" rx="3" fill="#1f6feb"/>
-      <rect x="22" y="14" width="56" height="72" rx="3" fill="none" stroke="#eaf2ff" stroke-width="3"/>
-      <line x1="22" y1="50" x2="78" y2="50" stroke="#eaf2ff" stroke-width="3.5"/>
-      <line x1="22" y1="28" x2="78" y2="28" stroke="#eaf2ff" stroke-width="2"/>
-      <line x1="22" y1="72" x2="78" y2="72" stroke="#eaf2ff" stroke-width="2"/>
-      <line x1="50" y1="28" x2="50" y2="72" stroke="#eaf2ff" stroke-width="2"/>
-      <circle cx="64" cy="62" r="7" fill="#ffcc00"/></svg>`,
-    glyph: `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">
-      <rect x="22" y="16" width="56" height="68" rx="4"/><line x1="22" y1="50" x2="78" y2="50"/>
-      <circle cx="63" cy="65" r="6" fill="currentColor" stroke="none"/></svg>`,
   },
   C: {
     name: 'C — Forty–forty',
