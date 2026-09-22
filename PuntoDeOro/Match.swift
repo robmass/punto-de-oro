@@ -47,8 +47,8 @@ struct Match {
 /// The score derived from a Point log.
 struct Score {
     private let firstServer: Team
-    private var pointsInGame: [Team: Int] = [.us: 0, .them: 0]
-    private var gamesWon: [Team: Int] = [.us: 0, .them: 0]
+    private var pointsInGame = Tally()
+    private var gamesWon = Tally()
 
     fileprivate init(firstServer: Team) {
         self.firstServer = firstServer
@@ -56,23 +56,34 @@ struct Score {
 
     /// Serve alternates every Game.
     var servingTeam: Team {
-        (gamesWon[.us]! + gamesWon[.them]!).isMultiple(of: 2) ? firstServer : firstServer.opponent
+        gamesWon.total.isMultiple(of: 2) ? firstServer : firstServer.opponent
     }
 
     func points(_ team: Team) -> String {
-        let own = pointsInGame[team]!, other = pointsInGame[team.opponent]!
-        if own >= 3 && other >= 3 { return own > other ? "AD" : "40" }
+        let own = pointsInGame[team], opponent = pointsInGame[team.opponent]
+        if own >= 3 && opponent >= 3 { return own > opponent ? "AD" : "40" }
         return ["0", "15", "30", "40"][own]
     }
 
-    func games(_ team: Team) -> Int { gamesWon[team]! }
+    func games(_ team: Team) -> Int { gamesWon[team] }
 
     fileprivate mutating func record(_ winner: Team) {
-        pointsInGame[winner]! += 1
-        let own = pointsInGame[winner]!, other = pointsInGame[winner.opponent]!
-        if own >= 4 && own - other >= 2 {
-            gamesWon[winner]! += 1
-            pointsInGame = [.us: 0, .them: 0]
+        pointsInGame[winner] += 1
+        if pointsInGame[winner] >= 4 && pointsInGame[winner] - pointsInGame[winner.opponent] >= 2 {
+            gamesWon[winner] += 1
+            pointsInGame = Tally()
         }
+    }
+}
+
+/// A count kept for each Team.
+private struct Tally {
+    private var us = 0, them = 0
+
+    var total: Int { us + them }
+
+    subscript(team: Team) -> Int {
+        get { team == .us ? us : them }
+        set { if team == .us { us = newValue } else { them = newValue } }
     }
 }
