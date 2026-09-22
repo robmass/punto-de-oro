@@ -254,7 +254,7 @@ The trailing page of the root TabView, and the screen the player stares at for n
 
 ```
 ┌─────────────────────────────┐
-│ ↶                     10:24 │  top bar, 26pt, black
+│ ↶                     10:24 │  top bar, 36pt, black
 ├─────────────────────────────┤
 │                             │
 │          THEM               │  top half — Them
@@ -270,8 +270,11 @@ The trailing page of the root TabView, and the screen the player stares at for n
 └─────────────────────────────┘
 ```
 
-- **Top bar (26pt, black).** Undo `↶` on the left (`topBarLeading`), clock on the right. It sits
+- **Top bar (36pt, black).** Undo `↶` on the left (`topBarLeading`), clock on the right. It sits
   *outside* both halves, so it reads as undo for the whole match rather than for one team.
+  The clock is the system's and cannot be moved or hidden; 36pt is what holds it on every
+  watch (its bottom edge is lowest on the 49mm Ultra, at 33.5pt). The prototype's 26pt let it
+  spill into the Them half from 42mm up.
 - **Top half = Them. Bottom half = Us.** As if looking across the net. Each half shows the Team
   label, its point score (0/15/30/40/AD, or tie-break numbers) and a ball marker when that Team
   is serving.
@@ -292,23 +295,23 @@ tie-break.
 **Governing principle:** *mid-rally blind targets stay maximal and pinned; everything eyes-on
 may scale, shrink, or sit under the hit-target minimum.*
 
-The top bar (26pt) and middle strip (34pt) **keep their point heights on every watch** — they
+The top bar (36pt) and middle strip (34pt) **keep their point heights on every watch** — they
 carry identical content everywhere and neither is a scoring target, so scaling them buys
 nothing and costs strip legibility at 40mm. **The two halves split the remainder.**
 
 | Case | Screen (pt) | Half height | Models |
 |---|---|---|---|
-| 40mm | 162×197 | 68pt | Series 6, SE 2 — **design floor** |
-| 41mm | 176×215 | 77pt | Series 7/8/9 |
-| 42mm | 187×223 | 81pt | Series 10/11/12 |
-| 44mm | 184×224 | 82pt | Series 6, SE 2 |
-| 45mm | 198×242 | 91pt | Series 7/8/9 — **dev device** |
-| 46mm | 208×248 | 94pt | Series 10/11/12 |
-| 49mm | 205×251 | 95pt | Ultra 1–4 |
+| 40mm | 162×197 | 63pt | Series 6, SE 2 — **design floor** |
+| 41mm | 176×215 | 72pt | Series 7/8/9 |
+| 42mm | 187×223 | 76pt | Series 10/11/12 |
+| 44mm | 184×224 | 77pt | Series 6, SE 2 |
+| 45mm | 198×242 | 86pt | Series 7/8/9 — **dev device** |
+| 46mm | 208×248 | 89pt | Series 10/11/12 |
+| 49mm | 205×251 | 90pt | Ultra 1–4 |
 
-- **The score digit scales with its half, at ~70% of half height** — ~48pt at 40mm, ~66pt at
+- **The score digit scales with its half, at ~70% of half height** — ~44pt at 40mm, ~63pt at
   49mm. The largest element on screen is always as large as that screen allows.
-  *(Build note: the prototype rendered 56pt at 45mm, where the 70% rule gives ~64pt. Follow the
+  *(Build note: the prototype rendered 56pt at 45mm, where the 70% rule gives ~60pt. Follow the
   rule and check it by eye on the 45mm device — this is the one numeric inconsistency left in
   the map.)*
 - Nothing is letterboxed. There is no fixed-geometry fallback.
@@ -337,16 +340,16 @@ Undone · point Them · 30–15
 
 ### Hit targets
 
-- **The halves are never the problem.** At the 40mm floor each is 162×68pt, far above the
+- **The halves are never the problem.** At the 40mm floor each is 162×63pt, far above the
   44×44pt minimum, and full-width at every size by construction.
 - **The middle strip is a dead zone.** A tap on it does nothing. This works *because* every
   scored point fires a haptic — so a tap that lands on the strip produces **silence, and silence
   is the error signal**. The cost of an ambiguous tap is one repeat; routing it to the nearest
   half would cost an undo plus a re-tap, and could put a point on the wrong team unnoticed. The
   dead band is exactly the visible 34pt — no invisible buffer, so nothing dead is undrawn.
-- **The undo button widens sideways to ~60×26pt and stays inside the top bar.** It never extends
+- **The undo button widens sideways to ~60×36pt and stays inside the top bar.** It never extends
   into a half. Under-height is accepted: undo is a deliberate, eyes-on, between-points action.
-  Giving it a full 44pt would consume 26% of the Them half at 40mm and turn a top-left tap aimed
+  Giving it a full 44pt would take the top of the Them half at 40mm and turn a top-left tap aimed
   at Them into an undo.
 - **The general rule:** any control that is not mid-rally may sit under the minimum, provided it
   lives in the top bar and takes no area from a half.

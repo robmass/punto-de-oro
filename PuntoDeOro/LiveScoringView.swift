@@ -5,8 +5,9 @@ struct LiveScoringView: View {
     @State private var match = Match()
     @State private var toast: String?
 
-    /// Pinned on every watch; the halves split the remainder.
-    private static let topBarHeight: CGFloat = 26
+    /// Pinned on every watch; the halves split the remainder. The top bar is tall enough to
+    /// hold the system clock, which sits lowest (bottom at 33.5pt) on the 49mm Ultra.
+    private static let topBarHeight: CGFloat = 36
     private static let stripHeight: CGFloat = 34
 
     var body: some View {
