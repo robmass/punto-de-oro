@@ -68,6 +68,10 @@ _Avoid_: Server (implies an individual player)
 The Game that decides a Set level at 6–6 (or 8–8 in a pro set), scored 0, 1, 2… to 7, won by two. The deuce rule never applies inside it; the Set is recorded as 7–6 (or 9–8).
 _Avoid_: Tiebreaker, sudden death
 
+**Change of ends**:
+The moment the Teams swap sides of the court: after every odd completed Game of a Set (counted per Set, so an Infinite match counts its running Games) and every 6 Points of a Tie-break. Derived from the Point log; the on-screen halves never swap with it.
+_Avoid_: Changeover, switching sides
+
 **Super tie-break**:
 A Tie-break played to 10 instead of 7, still won by two. It either replaces the third Set (2 sets + super tie-break) or decides a Pro set at 8–8.
 _Avoid_: Match tie-break, champions tie-break, long tie-break
