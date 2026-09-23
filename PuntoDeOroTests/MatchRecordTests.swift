@@ -18,16 +18,16 @@ final class MatchRecordTests {
         return container.mainContext
     }
 
-    @Test func aStartedMatchIsTheOneToResume() throws {
+    @Test func aStartedMatchIsTheCurrentOne() throws {
         let context = try relaunch()
-        #expect(try MatchRecord.resumable(in: context) == nil)
+        #expect(try MatchRecord.current(in: context) == nil)
 
         MatchRecord.start(Rules(deuceRule: .goldenPoint), in: context)
 
-        let resumed = try #require(try MatchRecord.resumable(in: relaunch()))
-        #expect(resumed.state == .inProgress)
-        #expect(resumed.match.points.isEmpty)
-        #expect(resumed.decidedAt == nil)
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.state == .inProgress)
+        #expect(relaunched.match.points.isEmpty)
+        #expect(relaunched.decidedAt == nil)
     }
 
     @Test(arguments: [
@@ -40,8 +40,8 @@ final class MatchRecordTests {
     func theRulesSurviveARelaunch(rules: Rules) throws {
         MatchRecord.start(rules, in: try relaunch())
 
-        let resumed = try #require(try MatchRecord.resumable(in: relaunch()))
-        #expect(resumed.rules == rules)
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.rules == rules)
     }
 
     @Test func everyPointIsSavedAsItIsScored() throws {
@@ -52,11 +52,11 @@ final class MatchRecordTests {
             record.scorePoint(for: team, at: played + Double(offset))
         }
 
-        let resumed = try #require(try MatchRecord.resumable(in: relaunch()))
-        #expect(resumed.match.points.map(\.winner) == gamesToLove(.them, 1) + [.us, .us, .them])
-        #expect(resumed.match.points.last?.timestamp == played + 6)
-        #expect(resumed.startDate == startDate)
-        let score = resumed.match.score
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.match.points.map(\.winner) == gamesToLove(.them, 1) + [.us, .us, .them])
+        #expect(relaunched.match.points.last?.timestamp == played + 6)
+        #expect(relaunched.startDate == startDate)
+        let score = relaunched.match.score
         #expect(score.games(.them) == 1)
         #expect(score.points(.us) == "30")
         #expect(score.points(.them) == "15")
@@ -68,26 +68,27 @@ final class MatchRecordTests {
 
         #expect(record.undo() == "Undone · point Us · 15–15")
 
-        let resumed = try #require(try MatchRecord.resumable(in: relaunch()))
-        #expect(resumed.match.points.map(\.winner) == [.us, .them])
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.match.points.map(\.winner) == [.us, .them])
     }
 
     @Test func theWinningPointDecidesTheMatchAndUndoReopensIt() throws {
         let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
-        for team in gamesToLove(.us, 8) + gamesToLove(.them, 3) + [.us, .us, .us] { record.scorePoint(for: team) }
+        let matchPoint = gamesToLove(.us, 8) + gamesToLove(.them, 3) + [.us, .us, .us]
+        for team in matchPoint { record.scorePoint(for: team) }
         let winningPoint = Date(timeIntervalSinceReferenceDate: 2_000)
         record.scorePoint(for: .us, at: winningPoint)
 
-        var resumed = try #require(try MatchRecord.resumable(in: relaunch()))
-        #expect(resumed.state == .decided)
-        #expect(resumed.decidedAt == winningPoint)
-        #expect(resumed.match.score.winner == .us)
+        var relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.state == .decided)
+        #expect(relaunched.decidedAt == winningPoint)
+        #expect(relaunched.match.score.winner == .us)
 
         record.undo()
 
-        resumed = try #require(try MatchRecord.resumable(in: relaunch()))
-        #expect(resumed.state == .inProgress)
-        #expect(resumed.decidedAt == nil)
+        relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.state == .inProgress)
+        #expect(relaunched.decidedAt == nil)
     }
 
     @Test func aPointAfterTheMatchIsDecidedIsNotRecorded() throws {
@@ -101,13 +102,13 @@ final class MatchRecordTests {
         #expect(record.decidedAt == decidedAt)
     }
 
-    @Test func finishedRecordsAreKeptButNeverResumed() throws {
+    @Test func finishedRecordsAreKeptButNeverCurrent() throws {
         let context = try relaunch()
         let first = MatchRecord.start(Rules(), in: context)
         first.scorePoint(for: .us)
         first.finish()
 
-        #expect(try MatchRecord.resumable(in: relaunch()) == nil)
+        #expect(try MatchRecord.current(in: relaunch()) == nil)
         let kept = try relaunch().fetch(FetchDescriptor<MatchRecord>())
         #expect(kept.count == 1)
         #expect(kept.first?.state == .finished)
@@ -115,7 +116,21 @@ final class MatchRecordTests {
 
         MatchRecord.start(Rules(deuceRule: .starPoint), in: context)
 
-        let resumed = try #require(try MatchRecord.resumable(in: relaunch()))
-        #expect(resumed.rules.deuceRule == .starPoint)
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.rules.deuceRule == .starPoint)
+    }
+
+    @Test func aFinishedMatchIsFinal() throws {
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
+        for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
+        record.finish()
+
+        #expect(record.undo() == nil)
+        record.scorePoint(for: .them)
+
+        let kept = try #require(try relaunch().fetch(FetchDescriptor<MatchRecord>()).first)
+        #expect(kept.state == .finished)
+        #expect(kept.match.points.count == 36)
+        #expect(kept.decidedAt != nil)
     }
 }

@@ -1,14 +1,14 @@
 import SwiftData
 import SwiftUI
 
-/// The scene root: the single non-Finished Match resumes straight into live scoring, score intact;
+/// The scene root: the single non-Finished Match opens straight into live scoring, score intact;
 /// with none on disk, the entry point starts one. Nothing else is restored, so a relaunch always
 /// lands on the live page.
 struct RootView: View {
-    @Query(MatchRecord.resumableDescriptor) private var resumable: [MatchRecord]
+    @Query(MatchRecord.currentDescriptor) private var current: [MatchRecord]
 
     var body: some View {
-        if let record = resumable.first {
+        if let record = current.first {
             LiveScoringView(record: record)
         } else {
             EntryPointView()
