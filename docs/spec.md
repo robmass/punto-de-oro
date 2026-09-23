@@ -221,8 +221,9 @@ One screen per choice, tap a row to advance. Neutral chrome — system white/gra
 | 4 | **Serve** | Two full-width buttons: **Us** / **Them**. |
 | 5 | **Ready** | Summary of the chosen Rules, and **Start**. |
 
-**Taps to start:** 5 for a fresh match, 6 for a Pro set, **2 to replay the last Rules**
-(Play again → Serve → … — Play again jumps straight to the Serve screen).
+**Taps to start:** 4 for a fresh match (Format → Deuce → Serve → Start), 5 for a Pro set,
+**3 to replay the last Rules** (Play again → Serve → Start — Play again jumps straight to the
+Serve screen). Every path ends on Ready, so the Rules are always seen before Start.
 
 **Remembering.** The last Rules used are the Rules of the most recent SwiftData record — no
 separate store. The current choice is ticked on each screen. **On a first run with no records,
