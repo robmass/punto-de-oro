@@ -218,25 +218,143 @@ struct MatchTests {
         #expect(score.isDecided)
         #expect(!score.isChangeOfEnds)
     }
-}
 
-/// The Points that win this many Games in a row to love.
-private func gamesToLove(_ team: Team, _ count: Int) -> [Team] {
-    Array(repeating: team, count: 4 * count)
-}
+    @Test func aSuperTieBreakCuesAChangeOfEndsEverySixPoints() {
+        let oneSetAll = gamesToLove(.us, 6) + gamesToLove(.them, 6)
+        let alternating = (0..<14).map { $0.isMultiple(of: 2) ? Team.us : .them }
+        let cued = (1...14).filter {
+            let log = oneSetAll + alternating.prefix($0)
+            return Match(rules: twoSetsPlusSuperTieBreak, pointsWonBy: log).score.isChangeOfEnds
+        }
+        #expect(cued == [6, 12])
+    }
 
-/// The Points that bring the first Set level at 6–6, with Us due to serve the Tie-break.
-private let sixAll = gamesToLove(.us, 5) + gamesToLove(.them, 6) + gamesToLove(.us, 1)
+    @Test func anInfiniteMatchCuesAChangeOfEndsAfterEveryOddGameOfItsRunningCount() {
+        let cued = (1...14).filter {
+            Match(rules: infinite, pointsWonBy: gamesToLove(.us, $0)).score.isChangeOfEnds
+        }
+        #expect(cued == [1, 3, 5, 7, 9, 11, 13])
+    }
 
-extension Score {
-    /// The completed Sets as [Us, Them] Games.
-    var setScores: [[Int]] { sets.map { [$0.games(.us), $0.games(.them)] } }
-}
+    @Test func aProSetIsWonByTheFirstTeamToNineGamesWithATwoGameLead() {
+        let eightSeven = gamesToLove(.us, 8) + gamesToLove(.them, 7)
+        #expect(!Match(rules: proSetToTieBreak, pointsWonBy: eightSeven).score.isDecided)
 
-extension Match {
-    /// A Match whose Point log holds these Points, played in order.
-    init(pointsWonBy winners: [Team]) {
-        self.init()
-        for team in winners { scorePoint(for: team) }
+        let nineSeven = gamesToLove(.them, 7) + gamesToLove(.us, 9)
+        let score = Match(rules: proSetToTieBreak, pointsWonBy: nineSeven).score
+        #expect(score.isDecided)
+        #expect(score.winner == .us)
+        #expect(score.setScores == [[9, 7]])
+    }
+
+    @Test func atEightAllAProSetIsDecidedByATieBreakToSevenAndRecordedNineEight() {
+        let eightAll = gamesToLove(.us, 8) + gamesToLove(.them, 8)
+        let tieBreak = Match(rules: proSetToTieBreak, pointsWonBy: eightAll).score
+        #expect(tieBreak.tieBreak == .tieBreak)
+
+        let tieBreakWon = eightAll + Array(repeating: .them, count: 7)
+        let decided = Match(rules: proSetToTieBreak, pointsWonBy: tieBreakWon).score
+        #expect(decided.winner == .them)
+        #expect(decided.setScores == [[8, 9]])
+    }
+
+    @Test func atEightAllAProSetCanBeDecidedByASuperTieBreakToTenAndRecordedNineEight() {
+        let eightAll = gamesToLove(.us, 8) + gamesToLove(.them, 8)
+        #expect(Match(rules: proSetToSuperTieBreak, pointsWonBy: eightAll).score.tieBreak == .superTieBreak)
+
+        let sevenLoveLog = eightAll + Array(repeating: .us, count: 7)
+        let sevenLove = Match(rules: proSetToSuperTieBreak, pointsWonBy: sevenLoveLog).score
+        #expect(!sevenLove.isDecided)
+        #expect(sevenLove.points(.us) == "7")
+
+        let nineAll = eightAll + Array(repeating: .us, count: 9) + Array(repeating: .them, count: 9)
+        let tenNine = Match(rules: proSetToSuperTieBreak, pointsWonBy: nineAll + [.us]).score
+        #expect(!tenNine.isDecided)
+        #expect(tenNine.points(.us) == "10")
+        #expect(tenNine.points(.them) == "9")
+
+        let decided = Match(rules: proSetToSuperTieBreak, pointsWonBy: nineAll + [.us, .us]).score
+        #expect(decided.winner == .us)
+        #expect(decided.setScores == [[9, 8]])
+    }
+
+    @Test func atOneSetAllASuperTieBreakToTenReplacesTheThirdSet() {
+        let oneSetAll = gamesToLove(.us, 2) + gamesToLove(.them, 4) + gamesToLove(.us, 4)
+            + gamesToLove(.us, 3) + gamesToLove(.them, 6)
+        let superTieBreak = Match(rules: twoSetsPlusSuperTieBreak, pointsWonBy: oneSetAll).score
+        #expect(superTieBreak.setScores == [[6, 4], [3, 6]])
+        #expect(superTieBreak.tieBreak == .superTieBreak)
+
+        let sevenAll = oneSetAll + Array(repeating: .us, count: 7) + Array(repeating: .them, count: 7)
+        let nineSeven = Match(rules: twoSetsPlusSuperTieBreak, pointsWonBy: sevenAll + [.us, .us]).score
+        #expect(!nineSeven.isDecided)
+        #expect(nineSeven.points(.us) == "9")
+
+        let decided = Match(rules: twoSetsPlusSuperTieBreak, pointsWonBy: sevenAll + [.us, .us, .us]).score
+        #expect(decided.winner == .us)
+        #expect(decided.setScores == [[6, 4], [3, 6], [10, 7]])
+        #expect(decided.sets.last?.isSuperTieBreak == true)
+    }
+
+    @Test func theThirdSetSuperTieBreakIsServedLikeATieBreak() {
+        // 19 Games played, so Them are due to serve the twentieth.
+        let oneSetAll = gamesToLove(.us, 2) + gamesToLove(.them, 4) + gamesToLove(.us, 4)
+            + gamesToLove(.us, 3) + gamesToLove(.them, 6)
+        let servers = (0..<5).map { played in
+            let log = oneSetAll + Array(repeating: .us, count: played)
+            return Match(rules: twoSetsPlusSuperTieBreak, pointsWonBy: log).score.servingTeam
+        }
+        #expect(servers == [.them, .us, .us, .them, .them])
+    }
+
+    @Test func theDeuceRuleNeverAppliesInsideASuperTieBreak() {
+        let goldenPoint = Rules(format: .twoSetsPlusSuperTieBreak, deuceRule: .goldenPoint)
+        let oneSetAll = gamesToLove(.us, 6) + gamesToLove(.them, 6)
+        let threeAll = oneSetAll + [.us, .us, .us, .them, .them, .them]
+        #expect(!Match(rules: goldenPoint, pointsWonBy: threeAll).score.isDecidingPoint)
+
+        let nineAll = oneSetAll + Array(repeating: .us, count: 9) + Array(repeating: .them, count: 9)
+        let tenNine = Match(rules: goldenPoint, pointsWonBy: nineAll + [.them]).score
+        #expect(!tenNine.isDecided)
+        #expect(tenNine.points(.them) == "10")
+    }
+
+    @Test func twoSetsToLoveNeedsNoSuperTieBreak() {
+        let decided = Match(rules: twoSetsPlusSuperTieBreak, pointsWonBy: gamesToLove(.them, 12)).score
+        #expect(decided.winner == .them)
+        #expect(decided.setScores == [[0, 6], [0, 6]])
+        #expect(decided.tieBreak == nil)
+    }
+
+    @Test func anInfiniteMatchKeepsARunningCountOfGamesWithNoSetsOrTieBreaks() {
+        let score = Match(rules: infinite, pointsWonBy: gamesToLove(.us, 7) + gamesToLove(.them, 9)).score
+        #expect(score.games(.us) == 7)
+        #expect(score.games(.them) == 9)
+        #expect(score.sets.isEmpty)
+        #expect(!score.isTieBreak)
+        #expect(!score.isDecided)
+    }
+
+    @Test func anInfiniteMatchIsWonOnCompletedGamesOnly() {
+        let log = gamesToLove(.them, 3) + gamesToLove(.us, 2) + [.us, .us, .us]
+        let score = Match(rules: infinite, pointsWonBy: log).score
+        #expect(score.points(.us) == "40")
+        #expect(score.result == .won(.them))
+    }
+
+    @Test func levelCompletedGamesInAnInfiniteMatchAreADrawWhateverTheUnfinishedGame() {
+        let log = gamesToLove(.them, 4) + gamesToLove(.us, 4) + [.us, .us, .us]
+        let score = Match(rules: infinite, pointsWonBy: log).score
+        #expect(score.result == .draw)
+    }
+
+    @Test func aSetBasedMatchEndedBeforeItsWinningPointIsUnfinished() {
+        #expect(Match(pointsWonBy: gamesToLove(.us, 8)).score.result == .unfinished)
+        #expect(Match(pointsWonBy: gamesToLove(.us, 12)).score.result == .won(.us))
     }
 }
+
+private let proSetToTieBreak = Rules(format: .proSet(decider: .tieBreak))
+private let proSetToSuperTieBreak = Rules(format: .proSet(decider: .superTieBreak))
+private let twoSetsPlusSuperTieBreak = Rules(format: .twoSetsPlusSuperTieBreak)
+private let infinite = Rules(format: .infinite)

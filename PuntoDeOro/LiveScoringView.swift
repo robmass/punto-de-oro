@@ -2,8 +2,12 @@ import SwiftUI
 
 /// The "Halves" live scoring screen: tap a half to score a Point for that Team.
 struct LiveScoringView: View {
-    @State private var match = Match()
+    @State private var match: Match
     @State private var toast: String?
+
+    init(match: Match = Match()) {
+        _match = State(initialValue: match)
+    }
 
     /// Pinned on every watch; the halves split the remainder. The top bar is tall enough to
     /// hold the system clock, which sits lowest (bottom at 33.5pt) on the 49mm Ultra.
@@ -72,42 +76,53 @@ struct LiveScoringView: View {
     }
 
     /// The dead band: no gesture, so a tap here does nothing. Completed Sets read left to right,
-    /// then the Games of the Set being played.
+    /// then the Games of the Set being played; an Infinite match has only its running Game count,
+    /// and a Super tie-break replacing the third Set has no Games to show. At a Deciding point the
+    /// whole strip turns gold, the one place the app spends it, and everything on it goes black to
+    /// stay legible.
     private func strip(_ score: Score) -> some View {
-        HStack(spacing: 10) {
+        let isDecidingPoint = score.isDecidingPoint
+        return HStack(spacing: 10) {
             ForEach(score.sets.indices, id: \.self) { index in
-                gamesColumn(score.sets[index].games)
+                gamesColumn(score.sets[index].games, isDecidingPoint: isDecidingPoint)
                     .opacity(0.6)
             }
-            if !score.isDecided {
-                gamesColumn(score.games)
+            if !score.isDecided && !score.isThirdSetSuperTieBreak {
+                gamesColumn(score.games, isDecidingPoint: isDecidingPoint)
             }
             if let status = statusLabel(score) {
                 Text(status)
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
         }
         .font(.system(size: 15, weight: .semibold).monospacedDigit())
         .frame(maxWidth: .infinity)
         .frame(height: Self.stripHeight)
-        .background(Palette.strip, ignoresSafeAreaEdges: [])
+        .foregroundStyle(isDecidingPoint ? .black : .white)
+        .background(isDecidingPoint ? Palette.gold : Palette.strip, ignoresSafeAreaEdges: [])
     }
 
-    private func gamesColumn(_ games: (Team) -> Int) -> some View {
+    private func gamesColumn(_ games: (Team) -> Int, isDecidingPoint: Bool) -> some View {
         VStack(spacing: -2) {
-            Text("\(games(.them))").foregroundStyle(Team.them.color)
-            Text("\(games(.us))").foregroundStyle(Team.us.color)
+            Text("\(games(.them))").foregroundStyle(isDecidingPoint ? .black : Team.them.color)
+            Text("\(games(.us))").foregroundStyle(isDecidingPoint ? .black : Team.us.color)
         }
     }
 
-    /// `CHANGE ENDS` until the next Point, else `TIE-BREAK` while one is played. Once the Match is
-    /// Decided, a placeholder names the winner until the summary screen lands. All white on the
-    /// ordinary strip, since gold is reserved.
+    /// The Deuce rule's name at a Deciding point, `CHANGE ENDS` until the next Point, `TIE-BREAK` or
+    /// `SUPER TIE-BREAK` while one is played. Once the Match is Decided, a placeholder names the
+    /// winner until the summary screen lands.
     private func statusLabel(_ score: Score) -> String? {
         if let winner = score.winner { return "\(winner.name.uppercased()) WIN" }
+        if score.isDecidingPoint { return match.rules.deuceRule.name.uppercased() }
         if score.isChangeOfEnds { return "CHANGE ENDS" }
-        return score.isTieBreak ? "TIE-BREAK" : nil
+        switch score.tieBreak {
+        case .tieBreak: return "TIE-BREAK"
+        case .superTieBreak: return "SUPER TIE-BREAK"
+        case nil: return nil
+        }
     }
 
     @ViewBuilder
@@ -130,6 +145,8 @@ struct LiveScoringView: View {
 }
 
 private enum Palette {
+    /// Reserved for the Deciding point strip; spent nowhere else in the app.
+    static let gold = Color(red: 0xFF / 255, green: 0xCC / 255, blue: 0x00 / 255)
     static let serveMarker = Color(red: 0xD4 / 255, green: 0xFF / 255, blue: 0x3A / 255)
     static let strip = Color(white: 0x11 / 255)
 }
@@ -150,6 +167,25 @@ private extension Team {
     }
 }
 
-#Preview {
+#Preview("3 sets") {
     LiveScoringView()
+}
+
+#Preview("Golden point") {
+    var match = Match(rules: Rules(deuceRule: .goldenPoint))
+    for team: Team in [.us, .us, .us, .them, .them, .them] { match.scorePoint(for: team) }
+    return LiveScoringView(match: match)
+}
+
+#Preview("Super tie-break") {
+    let oneSetAll = [Team](repeating: .us, count: 24) + [Team](repeating: .them, count: 24)
+    var match = Match(rules: Rules(format: .twoSetsPlusSuperTieBreak))
+    for team in oneSetAll + [.us, .them, .us] { match.scorePoint(for: team) }
+    return LiveScoringView(match: match)
+}
+
+#Preview("Infinite") {
+    var match = Match(rules: Rules(format: .infinite))
+    for team in [Team](repeating: .them, count: 44) + [.us, .us] { match.scorePoint(for: team) }
+    return LiveScoringView(match: match)
 }
