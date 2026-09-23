@@ -24,9 +24,11 @@
 		782DB8A39FE3EE7CE267566F /* Launcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */; };
 		79663A44A10B711A615A98CC /* Haptic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C16C48744614A3D9385ACC /* Haptic.swift */; };
 		84641D7C6EFE95F974748C06 /* Launcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */; };
+		92EFF2EF0F6DC0B9E208C64F /* LiveStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B1F9EDE5C2E27EF470DA90 /* LiveStyleTests.swift */; };
 		981E7654B18E4E5FB7825A5E /* SetupWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */; };
 		9F0FC5FD0245C328CA312090 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB652EC33ADEB4450F3181E /* SummaryView.swift */; };
 		A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */; };
+		A3C0927ABA94EFED8EA74B18 /* LiveStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */; };
 		B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */; };
 		C514BAAB94A5937A3FE33C1B /* CourtGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE9ED325A3586775B7708E3 /* CourtGlyph.swift */; };
 		C8248CD2734C3FF24CFBE46F /* PuntoDeOroLauncher.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 79A38E53DB506762998AE334 /* PuntoDeOroLauncher.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -71,6 +73,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		00B1F9EDE5C2E27EF470DA90 /* LiveStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveStyleTests.swift; sourceTree = "<group>"; };
 		00C97310DF8415E497CE78C0 /* LauncherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherTests.swift; sourceTree = "<group>"; };
 		0820ACD0049B3EF42241B96D /* LiveScoringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScoringView.swift; sourceTree = "<group>"; };
 		0920C4C58109879268D652E8 /* PuntoDeOroLauncherBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroLauncherBundle.swift; sourceTree = "<group>"; };
@@ -99,6 +102,7 @@
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
 		C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher.swift; sourceTree = "<group>"; };
 		C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuntoDeOroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveStyle.swift; sourceTree = "<group>"; };
 		D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeuceRuleTests.swift; sourceTree = "<group>"; };
 		E9427B1814EC8BE2BF988ACE /* MatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchTests.swift; sourceTree = "<group>"; };
 		F453426AF151D2F08C069BBA /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -125,6 +129,7 @@
 				D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */,
 				FABAC452C10C835680F7BB26 /* HapticTests.swift */,
 				00C97310DF8415E497CE78C0 /* LauncherTests.swift */,
+				00B1F9EDE5C2E27EF470DA90 /* LiveStyleTests.swift */,
 				2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */,
 				54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */,
 				E9427B1814EC8BE2BF988ACE /* MatchTests.swift */,
@@ -153,6 +158,7 @@
 				39C16C48744614A3D9385ACC /* Haptic.swift */,
 				35FF2E5F1FFC20012592FC29 /* Info.plist */,
 				0820ACD0049B3EF42241B96D /* LiveScoringView.swift */,
+				D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */,
 				8B751D83F59BF072BE01CE1C /* Match.swift */,
 				5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */,
 				29B3153C9F371680C540518C /* MatchRecord.swift */,
@@ -303,6 +309,7 @@
 				484A6753801FBF1861DE2F82 /* HapticTests.swift in Sources */,
 				84641D7C6EFE95F974748C06 /* Launcher.swift in Sources */,
 				3B2C98678BC76D19CF228E84 /* LauncherTests.swift in Sources */,
+				92EFF2EF0F6DC0B9E208C64F /* LiveStyleTests.swift in Sources */,
 				B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */,
 				02178DCD62305B6171C4CABD /* MatchSummaryTests.swift in Sources */,
 				33EF3132361FC686046AF61F /* MatchTests.swift in Sources */,
@@ -318,6 +325,7 @@
 				FAE2160B29E1AB0A496AE4DE /* AppDelegate.swift in Sources */,
 				79663A44A10B711A615A98CC /* Haptic.swift in Sources */,
 				EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */,
+				A3C0927ABA94EFED8EA74B18 /* LiveStyle.swift in Sources */,
 				4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */,
 				5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */,
 				DAA095EDABC75F93CEF6B2CB /* MatchRecord.swift in Sources */,

@@ -9,6 +9,9 @@ struct LiveScoringView: View {
     /// trailing, and the controls page is leading.
     let isPrimaryActionEnabled: Bool
     @State private var toast: String?
+    /// Always On. Only the paint changes while dimmed: every frame and tap area stays as it is, so a
+    /// tap with the wrist down lands where it did with the wrist up.
+    @Environment(\.isLuminanceReduced) private var isDimmed
 
     /// Pinned on every watch; the halves split the remainder. The top bar is tall enough to
     /// hold the system clock, which sits lowest (bottom at 33.5pt) on the 49mm Ultra.
@@ -29,6 +32,8 @@ struct LiveScoringView: View {
         }
         .ignoresSafeArea()
         .overlay(alignment: .bottom) { toastView }
+        // Nothing animates in Always On.
+        .transaction { if isDimmed { $0.disablesAnimations = true } }
     }
 
     private var topBar: some View {
@@ -63,7 +68,6 @@ struct LiveScoringView: View {
                 .minimumScaleFactor(0.5)
             if team == .us { label }
         }
-        .foregroundStyle(team.color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .leading) {
             if score.servingTeam == team {
@@ -74,7 +78,7 @@ struct LiveScoringView: View {
             }
         }
         .frame(height: height)
-        .background(team.halfBackground, ignoresSafeAreaEdges: [])
+        .paint(LiveStyle.half(team, isDimmed: isDimmed))
         .contentShape(Rectangle())
         .onTapGesture { Haptic.play(record.scorePoint(for: team)) }
     }
@@ -83,7 +87,7 @@ struct LiveScoringView: View {
     /// left to right, then the Games of the Set being played; an Infinite match has only its running
     /// Game count, and a Super tie-break replacing the third Set has no Games to show. At a Deciding
     /// point the whole strip turns gold, the one place the app spends it, and everything on it goes
-    /// black to stay legible.
+    /// black to stay legible; dimmed, it is a gold outline with everything on it gold.
     private func strip(_ match: Match, score: Score) -> some View {
         let isDecidingPoint = score.isDecidingPoint
         return HStack(spacing: 10) {
@@ -109,14 +113,15 @@ struct LiveScoringView: View {
         .font(.system(size: 15, weight: .semibold).monospacedDigit())
         .frame(maxWidth: .infinity)
         .frame(height: Self.stripHeight)
-        .foregroundStyle(isDecidingPoint ? .black : .white)
-        .background(isDecidingPoint ? Palette.gold : Palette.strip, ignoresSafeAreaEdges: [])
+        .paint(LiveStyle.strip(isDecidingPoint: isDecidingPoint, isDimmed: isDimmed))
     }
 
     private func gamesColumn(_ games: (Team) -> Int, isDecidingPoint: Bool) -> some View {
         VStack(spacing: -2) {
-            Text("\(games(.them))").foregroundStyle(isDecidingPoint ? .black : Team.them.color)
-            Text("\(games(.us))").foregroundStyle(isDecidingPoint ? .black : Team.us.color)
+            Text("\(games(.them))")
+                .foregroundStyle(LiveStyle.games(.them, isDecidingPoint: isDecidingPoint, isDimmed: isDimmed))
+            Text("\(games(.us))")
+                .foregroundStyle(LiveStyle.games(.us, isDecidingPoint: isDecidingPoint, isDimmed: isDimmed))
         }
     }
 
@@ -135,9 +140,10 @@ struct LiveScoringView: View {
         return labels
     }
 
+    /// Not while dimmed: its filled capsule would light up the black screen.
     @ViewBuilder
     private var toastView: some View {
-        if let toast {
+        if let toast, !isDimmed {
             Text(toast)
                 .font(.system(size: 10))
                 .lineLimit(1)
@@ -154,26 +160,20 @@ struct LiveScoringView: View {
     }
 }
 
-private enum Palette {
-    /// Reserved for the Deciding point strip; spent nowhere else in the app.
-    static let gold = Color(red: 0xFF / 255, green: 0xCC / 255, blue: 0x00 / 255)
-    static let serveMarker = Color(red: 0xD4 / 255, green: 0xFF / 255, blue: 0x3A / 255)
-    static let strip = Color(white: 0x11 / 255)
-}
-
-private extension Team {
-    var color: Color {
-        switch self {
-        case .us: Color(red: 0x30 / 255, green: 0xD1 / 255, blue: 0x58 / 255)
-        case .them: Color(red: 0xFF / 255, green: 0x9F / 255, blue: 0x0A / 255)
-        }
-    }
-
-    var halfBackground: Color {
-        switch self {
-        case .us: Color(red: 0x0F / 255, green: 0x3D / 255, blue: 0x1C / 255)
-        case .them: Color(red: 0x4A / 255, green: 0x2E / 255, blue: 0x05 / 255)
-        }
+private extension View {
+    /// Paints a surface without touching its layout: the fill behind it, the outline drawn inside its
+    /// edge and following the display's corners where it meets them.
+    func paint(_ style: Paint) -> some View {
+        foregroundStyle(style.foreground)
+            .background(style.fill, ignoresSafeAreaEdges: [])
+            .overlay {
+                if let outline = style.outline {
+                    ConcentricRectangle()
+                        .stroke(outline, lineWidth: 2)
+                        .padding(1)
+                        .allowsHitTesting(false)
+                }
+            }
     }
 }
 
@@ -221,4 +221,17 @@ private func previewRecord(_ rules: Rules = Rules(), pointsWonBy winners: [Team]
         Rules(format: .twoSetsPlusSuperTieBreak),
         pointsWonBy: oneSetAll + [.us, .them, .us, .them, .us, .them]
     ), isPrimaryActionEnabled: true)
+}
+
+#Preview("Always On") {
+    LiveScoringView(record: previewRecord(pointsWonBy: [.us, .us, .us, .us, .them]), isPrimaryActionEnabled: true)
+        .environment(\.isLuminanceReduced, true)
+}
+
+#Preview("Golden point, Always On") {
+    LiveScoringView(record: previewRecord(
+        Rules(deuceRule: .goldenPoint),
+        pointsWonBy: [.us, .us, .us, .them, .them, .them]
+    ), isPrimaryActionEnabled: true)
+    .environment(\.isLuminanceReduced, true)
 }

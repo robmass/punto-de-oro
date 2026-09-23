@@ -382,6 +382,14 @@ Haptics fire only on **new** Points — never on undo replay.
 - Nothing animates.
 - Controls stay tappable while dimmed: a tap runs the action *and* wakes the app.
 
+**As built:** only the paint changes; every frame is the same, so no tap area can move. Each half
+is outlined in its team colour; the strip, whose `#111` fill would vanish as an outline on black,
+is outlined in a brighter grey (`#4D4D4D`). The outlines follow the display's own corners where
+they meet them. At a deciding point the Games take the gold too, as they go black on the solid
+strip. The serve marker stays filled: it is content, not a background. The undo toast, a filled
+capsule, is not shown while dimmed. An End match dialog still open as the display dims is
+dismissed with the snap back to live, so the dimmed screen never holds Save or Discard.
+
 *Source: [Live scoring screen and point input](https://github.com/robmass/punto-de-oro/issues/5) ·
 [Sizing and accessibility](https://github.com/robmass/punto-de-oro/issues/10) ·
 [Changing ends](https://github.com/robmass/punto-de-oro/issues/8)*
@@ -648,6 +656,7 @@ read as the same app rather than two.
 | Us | `#30D158` | Us team colour (half background `#0F3D1C`) |
 | Them | `#FF9F0A` | Them team colour (half background `#4A2E05`) |
 | Serve marker | `#D4FF3A` | The ball marker on the serving Team's half |
+| Strip outline | `#4D4D4D` | The middle strip's outline in Always On, where its `#111` fill becomes an outline |
 | Chrome | system white / graphite | Setup selections, Start, undo glyph, End match |
 | Destructive red | system | Discard in the End match dialog — **the only red in the app** |
 
