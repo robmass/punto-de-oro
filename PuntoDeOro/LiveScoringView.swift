@@ -83,7 +83,9 @@ struct LiveScoringView: View {
                 gamesColumn(score.games)
             }
             if let status = statusLabel(score) {
-                Text(status).font(.system(size: 11, weight: .bold))
+                Text(status)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.white)
             }
         }
         .font(.system(size: 15, weight: .semibold).monospacedDigit())
@@ -99,10 +101,12 @@ struct LiveScoringView: View {
         }
     }
 
-    /// `TIE-BREAK` while one is played. Once the Match is Decided, a placeholder names the winner
-    /// until the summary screen lands.
+    /// `CHANGE ENDS` until the next Point, else `TIE-BREAK` while one is played. Once the Match is
+    /// Decided, a placeholder names the winner until the summary screen lands. All white on the
+    /// ordinary strip, since gold is reserved.
     private func statusLabel(_ score: Score) -> String? {
         if let winner = score.winner { return "\(winner.name.uppercased()) WIN" }
+        if score.isChangeOfEnds { return "CHANGE ENDS" }
         return score.isTieBreak ? "TIE-BREAK" : nil
     }
 

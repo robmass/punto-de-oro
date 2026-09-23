@@ -56,6 +56,10 @@ struct Score {
     private(set) var sets: [SetScore] = []
     /// The Team that won two Sets, once the Match is Decided.
     private(set) var winner: Team?
+    /// Whether the last Point sits on a Change of ends: an odd completed Game of the Set, or every
+    /// 6 Points of a Tie-break. Counting Games per Set cues a Set ending odd (6–3, 7–6) at its end,
+    /// and one ending even (6–4) after the first Game of the next Set.
+    private(set) var isChangeOfEnds = false
 
     var isDecided: Bool { winner != nil }
 
@@ -88,14 +92,21 @@ struct Score {
     fileprivate mutating func record(_ winner: Team) {
         let pointsToWinGame = isTieBreak ? 7 : 4
         pointsInGame[winner] += 1
-        guard pointsInGame.hasWon(winner, reaching: pointsToWinGame) else { return }
+        guard pointsInGame.hasWon(winner, reaching: pointsToWinGame) else {
+            isChangeOfEnds = isTieBreak && pointsInGame.total.isMultiple(of: 6)
+            return
+        }
         pointsInGame = Tally()
         gamesInSet[winner] += 1
         gamesPlayed += 1
+        isChangeOfEnds = !gamesInSet.total.isMultiple(of: 2)
         guard gamesInSet.hasWon(winner, reaching: 6) || gamesInSet[winner] == 7 else { return }
         sets.append(SetScore(games: gamesInSet))
         gamesInSet = Tally()
-        if sets.count(where: { $0.winner == winner }) == 2 { self.winner = winner }
+        if sets.count(where: { $0.winner == winner }) == 2 {
+            self.winner = winner
+            isChangeOfEnds = false
+        }
     }
 }
 
