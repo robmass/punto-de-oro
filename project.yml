@@ -17,6 +17,8 @@ targets:
     platform: watchOS
     sources:
       - PuntoDeOro
+    dependencies:
+      - target: PuntoDeOroLauncher
     # Every Match runs as a workout (spec §2, §8). No audio background mode: the app plays no audio,
     # and haptics during a workout are covered by the session.
     info:
@@ -38,11 +40,32 @@ targets:
         INFOPLIST_KEY_NSHealthUpdateUsageDescription: Punto de Oro saves every match to Health as a workout.
         INFOPLIST_KEY_WKWatchOnly: YES
         INFOPLIST_KEY_WKApplication: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  # The launcher complication (spec §9). Its bundle ID must sit under the app's.
+  PuntoDeOroLauncher:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - PuntoDeOroLauncher
+    info:
+      path: PuntoDeOroLauncher/Info.plist
+      properties:
+        CFBundleDisplayName: Punto de Oro
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.robmass.PuntoDeOro.Launcher
   PuntoDeOroTests:
     type: bundle.unit-test
     platform: watchOS
     sources:
       - PuntoDeOroTests
+      # An extension can't be imported, so the tests compile the launcher's testable parts.
+      - PuntoDeOroLauncher/CourtGlyph.swift
+      - PuntoDeOroLauncher/Launcher.swift
     dependencies:
       - target: PuntoDeOro
     settings:
