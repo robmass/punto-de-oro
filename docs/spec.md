@@ -229,9 +229,22 @@ Serve screen). Every path ends on Ready, so the Rules are always seen before Sta
 separate store. The current choice is ticked on each screen. **On a first run with no records,
 the Format screen shows its four rows and no Play again row.**
 
-**Health permission is requested on the first Start**, never at launch. The ask then arrives
-with a visible reason (a workout is about to begin), and the app opens straight into setup
-rather than into a permission sheet.
+**Health permission is asked for on the setup screen, never at Start.** Starting a Match must
+never ask anything, and nothing asks while a Match is underway:
+
+- **Whenever setup appears** (a launch into setup, or arriving back there after Done or
+  Discard), the app calls `requestAuthorization`. HealthKit shows the sheet only while access
+  is undetermined, or when a new type has been added, and does nothing once the players have
+  answered. So a first launch shows the sheet over the Format screen.
+- **A launch that resumes a Match in progress never asks**, since a sheet left unanswered could
+  appear over the scoring screen mid-match.
+- **Start only starts the activity** (`startActivity`, then `beginCollection`).
+- **Access denied** (`authorizationStatus(for: .workoutType())` is `.sharingDenied`): the Ready
+  screen shows one quiet line in neutral setup chrome, with no gold or red: *"Health off · no
+  workout. The app may return to the clock."* Start stays one tap, and the Match runs without a
+  workout (logged, and play continues).
+- **Undetermined at Start** (the sheet was left unanswered): the Match runs without a workout
+  and the Ready screen says nothing. The sheet asks again the next time setup appears.
 
 **Dynamic Type:** honoured in full, including accessibility sizes. One choice per screen, so
 the list simply scrolls.
@@ -240,6 +253,7 @@ the list simply scrolls.
 session.
 
 *Source: [Setup flow design](https://github.com/robmass/punto-de-oro/issues/4) ·
+[Health access on the setup screen](https://github.com/robmass/punto-de-oro/issues/34) ·
 prototype on [`prototype/setup-flow`](https://github.com/robmass/punto-de-oro/tree/prototype/setup-flow/Prototypes/SetupFlowPrototype)*
 
 ---
@@ -780,6 +794,7 @@ Every section traces to a closed ticket on the
 | [#10 Sizing and accessibility](https://github.com/robmass/punto-de-oro/issues/10) | §6 geometry, §11 |
 | [#11 App icon and visual identity](https://github.com/robmass/punto-de-oro/issues/11) | §10 |
 | [#12 End match control placement](https://github.com/robmass/punto-de-oro/issues/12) | §7 |
+| [#34 Health access on the setup screen](https://github.com/robmass/punto-de-oro/issues/34) | §5 — when Health access is asked for; supersedes #4 there |
 | [#7 Assemble the build-ready spec](https://github.com/robmass/punto-de-oro/issues/7) | This document |
 
 **Prototypes and research** (throwaway branches, kept as primary sources):

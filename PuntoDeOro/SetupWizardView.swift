@@ -4,6 +4,7 @@ import SwiftUI
 /// The setup wizard: one screen per choice, tap a row to advance. It is only ever the scene root's
 /// alternative to live scoring, so its NavigationStack never holds the live page, and Start swaps
 /// it out by making the new Match current. Neutral chrome: the gold stays with the Deciding point.
+/// Health access is asked for here, as setup appears, and never at Start.
 struct SetupWizardView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.workout) private var workout
@@ -28,6 +29,9 @@ struct SetupWizardView: View {
                 }
         }
         .tint(.white)
+        // At launch into setup, and back here after Done or Discard; never over a Match underway,
+        // since the root only shows setup when no Match is current.
+        .onAppear { workout.askForAccess() }
     }
 
     private var formatScreen: some View {
@@ -110,6 +114,11 @@ struct SetupWizardView: View {
                 .buttonStyle(.borderedProminent)
                 .foregroundStyle(.black)
                 .padding(.top, 8)
+                if let notice = workout.healthAccess.readyNotice {
+                    Text(notice)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

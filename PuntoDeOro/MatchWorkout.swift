@@ -8,6 +8,11 @@ import SwiftUI
 /// is no pause: the workout runs from Start until the Match is Finished or Abandoned.
 @MainActor
 protocol MatchWorkout: AnyObject {
+    /// Asks the players for Health access, from setup only: Start never asks, and nothing asks
+    /// while a Match is underway. Once they have answered, it asks nothing more.
+    func askForAccess()
+    /// Whether Health may save the workout, as last answered.
+    var healthAccess: HealthAccess { get }
     /// Starts the workout as the Match starts.
     func begin(at startDate: Date)
     /// Keeps a workout running under the current Match: the one HealthKit recovered after a crash,
@@ -20,6 +25,27 @@ protocol MatchWorkout: AnyObject {
     func discard()
     /// What the running workout has measured so far, for the summary.
     var stats: WorkoutStats { get }
+}
+
+/// Whether Health may save a Match's workout. Without it, a Match still runs, only without a workout.
+enum HealthAccess: Equatable {
+    /// Never answered: the sheet asks again the next time setup appears.
+    case undetermined
+    case allowed
+    case denied
+
+    init(_ status: HKAuthorizationStatus) {
+        switch status {
+        case .sharingAuthorized: self = .allowed
+        case .sharingDenied: self = .denied
+        default: self = .undetermined
+        }
+    }
+
+    /// The Ready screen's one quiet line, only once the players have said no.
+    var readyNotice: String? {
+        self == .denied ? "Health off · no workout. The app may return to the clock." : nil
+    }
 }
 
 /// What a Match's workout has measured: active energy and average heart rate, each nil until the
@@ -46,8 +72,8 @@ final class HealthWorkout: NSObject, MatchWorkout {
     private let store = HKHealthStore()
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
-    /// Each change waits for the one before, so a Discard made while authorization is still being
-    /// asked cannot overtake the Start it follows.
+    /// Each change waits for the one before, so a Discard made while the workout is still starting
+    /// cannot overtake the Start it follows.
     private var lastChange: Task<Void, Never>?
     /// Whether a Match wants the workout running, as last said; unknown after a launch until the
     /// current Match has been recovered.
@@ -55,8 +81,8 @@ final class HealthWorkout: NSObject, MatchWorkout {
     /// Each ending session's wait, resumed once it reaches `.ended`.
     private var sessionsEnding: [ObjectIdentifier: CheckedContinuation<Void, Never>] = [:]
 
-    /// Asked on every Start, so the first ask arrives with a visible reason, never at launch; once
-    /// the players have answered, HealthKit asks nothing more.
+    /// Asked each time setup appears, never at Start, so no sheet stands between the players and
+    /// the first point; once they have answered, HealthKit asks nothing more.
     private static let typesToShare: Set<HKSampleType> = [
         .workoutType(),
         HKQuantityType(.activeEnergyBurned),
@@ -66,6 +92,21 @@ final class HealthWorkout: NSObject, MatchWorkout {
         HKQuantityType(.activeEnergyBurned),
         HKQuantityType(.heartRate),
     ]
+
+    /// Not one of the changes: a sheet left unanswered must not hold up the Start that follows it.
+    func askForAccess() {
+        Task { [store] in
+            do {
+                try await store.requestAuthorization(toShare: Self.typesToShare, read: Self.typesToRead)
+            } catch {
+                Logger.workout.error("Could not ask for Health access: \(error)")
+            }
+        }
+    }
+
+    var healthAccess: HealthAccess {
+        HealthAccess(store.authorizationStatus(for: .workoutType()))
+    }
 
     func begin(at startDate: Date) {
         change { [self] in
@@ -132,7 +173,6 @@ final class HealthWorkout: NSObject, MatchWorkout {
     }
 
     private func startSession(at startDate: Date) async throws {
-        try await store.requestAuthorization(toShare: Self.typesToShare, read: Self.typesToRead)
         let configuration = HKWorkoutConfiguration()
         // There is no padel type in `HKWorkoutActivityType`; `.paddleSports` is canoe, kayak and
         // SUP, so padel is logged as its closest racket sport. Calorimetry is sensor-estimated for
@@ -247,6 +287,8 @@ extension HealthWorkout: HKWorkoutSessionDelegate {
 final class NoWorkout: MatchWorkout {
     nonisolated init() {}
 
+    func askForAccess() {}
+    var healthAccess: HealthAccess { .allowed }
     func begin(at startDate: Date) {}
     func keepRunning() {}
     func end(at decidedAt: Date) {}

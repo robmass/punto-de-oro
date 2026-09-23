@@ -292,6 +292,7 @@ final class MatchRecordTests {
 
     // MARK: - The workout
 
+    /// Start only begins the workout: it never asks for Health access, which setup does.
     @Test func startingAMatchBeginsItsWorkoutAtTheStart() throws {
         let startDate = Date(timeIntervalSinceReferenceDate: 500)
 
@@ -373,6 +374,7 @@ final class MatchRecordTests {
 
     // MARK: - Recovery
 
+    /// Nothing asks for Health access mid-match, so a resumed Match only keeps its workout running.
     @Test func aRecentMatchComesBackInProgressOnItsWorkout() throws {
         let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
         let played = Date(timeIntervalSinceReferenceDate: 1_000)
@@ -463,12 +465,14 @@ final class MatchRecordTests {
 @MainActor
 final class WorkoutSpy: MatchWorkout {
     enum Call: Equatable {
-        case begin(Date), keepRunning, end(Date), discard
+        case askForAccess, begin(Date), keepRunning, end(Date), discard
     }
 
     var calls: [Call] = []
     var stats = WorkoutStats()
+    var healthAccess = HealthAccess.allowed
 
+    func askForAccess() { calls.append(.askForAccess) }
     func begin(at startDate: Date) { calls.append(.begin(startDate)) }
     func keepRunning() { calls.append(.keepRunning) }
     func end(at decidedAt: Date) { calls.append(.end(decidedAt)) }
