@@ -51,9 +51,15 @@ struct MatchPagesView: View {
         }
     }
 
+    /// Without animation, since the display is dimming or going inactive: nothing animates in
+    /// Always On.
     private func returnToLive() {
-        isIndicatorShown = false
-        page = .live
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            isIndicatorShown = false
+            page = .live
+        }
     }
 }
 
@@ -112,6 +118,10 @@ private struct ControlsPageView: View {
         // so a dimmed screen is always the live page.
         .onChange(of: isConfirmingEnd) { _, isConfirming in
             if !isConfirming { page = .live }
+        }
+        // The dialog goes with the page, so a dimmed screen never holds Save or Discard.
+        .onChange(of: page) { _, page in
+            if page != .controls { isConfirmingEnd = false }
         }
     }
 }
