@@ -90,11 +90,16 @@ struct LiveScoringView: View {
             if !score.isDecided && !score.isThirdSetSuperTieBreak {
                 gamesColumn(score.games, isDecidingPoint: isDecidingPoint)
             }
-            if let status = statusLabel(score) {
-                Text(status)
-                    .font(.system(size: 11, weight: .bold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+            let statuses = statusLabels(score)
+            if !statuses.isEmpty {
+                VStack(spacing: 0) {
+                    ForEach(statuses, id: \.self) { status in
+                        Text(status)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                }
+                .font(.system(size: 11, weight: .bold))
             }
         }
         .font(.system(size: 15, weight: .semibold).monospacedDigit())
@@ -111,18 +116,21 @@ struct LiveScoringView: View {
         }
     }
 
-    /// The Deuce rule's name at a Deciding point, `CHANGE ENDS` until the next Point, `TIE-BREAK` or
-    /// `SUPER TIE-BREAK` while one is played. Once the Match is Decided, a placeholder names the
-    /// winner until the summary screen lands.
-    private func statusLabel(_ score: Score) -> String? {
-        if let winner = score.winner { return "\(winner.name.uppercased()) WIN" }
-        if score.isDecidingPoint { return match.rules.deuceRule.name.uppercased() }
-        if score.isChangeOfEnds { return "CHANGE ENDS" }
+    /// The strip's status, one label per line: the Deuce rule's name at a Deciding point, else
+    /// `TIE-BREAK` or `SUPER TIE-BREAK` while one is played, stacked over `CHANGE ENDS` until the
+    /// next Point. Once the Match is Decided, a placeholder names the winner until the summary
+    /// screen lands.
+    private func statusLabels(_ score: Score) -> [String] {
+        if let winner = score.winner { return ["\(winner.name.uppercased()) WIN"] }
+        if score.isDecidingPoint { return [match.rules.deuceRule.name.uppercased()] }
+        var labels: [String] = []
         switch score.tieBreak {
-        case .tieBreak: return "TIE-BREAK"
-        case .superTieBreak: return "SUPER TIE-BREAK"
-        case nil: return nil
+        case .tieBreak: labels.append("TIE-BREAK")
+        case .superTieBreak: labels.append("SUPER TIE-BREAK")
+        case nil: break
         }
+        if score.isChangeOfEnds { labels.append("CHANGE ENDS") }
+        return labels
     }
 
     @ViewBuilder
@@ -187,5 +195,12 @@ private extension Team {
 #Preview("Infinite") {
     var match = Match(rules: Rules(format: .infinite))
     for team in [Team](repeating: .them, count: 44) + [.us, .us] { match.scorePoint(for: team) }
+    return LiveScoringView(match: match)
+}
+
+#Preview("Change ends in a super tie-break") {
+    let oneSetAll = [Team](repeating: .us, count: 24) + [Team](repeating: .them, count: 24)
+    var match = Match(rules: Rules(format: .twoSetsPlusSuperTieBreak))
+    for team in oneSetAll + [.us, .them, .us, .them, .us, .them] { match.scorePoint(for: team) }
     return LiveScoringView(match: match)
 }
