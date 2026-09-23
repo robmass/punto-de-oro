@@ -161,6 +161,12 @@ struct Score {
 
     var isDecided: Bool { winner != nil }
 
+    /// Whether the Match is Infinite: a running count of Games, with no Sets.
+    var isInfinite: Bool { format == .infinite }
+
+    /// Whether a Point has been played in the Game being played.
+    var isGameUnderway: Bool { pointsInGame.total > 0 }
+
     /// The Result once the Match is Decided, whether by its winning Point or by the players ending it
     /// here. Infinite counts completed Games only; the unfinished Game is ignored.
     var result: Match.Result {
@@ -244,7 +250,7 @@ struct Score {
         isChangeOfEnds = !gamesInSet.total.isMultiple(of: 2)
         guard let gamesToWinSet = format.gamesToWinSet,
               tieBreak != nil || gamesInSet.hasWon(winner, reaching: gamesToWinSet) else { return }
-        completeSet(SetScore(games: gamesInSet), wonBy: winner)
+        completeSet(SetScore(games: gamesInSet, tieBreak: tieBreak != nil ? gamePoints : nil), wonBy: winner)
         gamesInSet = Tally()
     }
 
@@ -260,20 +266,27 @@ struct Score {
 /// The Games each Team won in a completed Set, or the Points of a Super tie-break that replaced it.
 struct SetScore {
     fileprivate let games: Tally
+    /// The Points of the tie-break that decided the Set, if one did.
+    private let tieBreak: Tally?
     let isSuperTieBreak: Bool
 
-    fileprivate init(games: Tally) {
+    fileprivate init(games: Tally, tieBreak: Tally?) {
         self.games = games
+        self.tieBreak = tieBreak
         isSuperTieBreak = false
     }
 
     fileprivate init(superTieBreak points: Tally) {
         games = points
+        tieBreak = nil
         isSuperTieBreak = true
     }
 
     /// Games won, or Points won when this was a Super tie-break.
     func games(_ team: Team) -> Int { games[team] }
+
+    /// The Points a Team won in the tie-break that decided the Set, or nil when none did.
+    func tieBreakPoints(_ team: Team) -> Int? { tieBreak?[team] }
 
     var winner: Team { games[.us] > games[.them] ? .us : .them }
 }

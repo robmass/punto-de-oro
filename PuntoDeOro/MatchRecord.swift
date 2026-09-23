@@ -152,6 +152,32 @@ enum MatchSchemaV1: VersionedSchema {
             return toast
         }
 
+        /// How the summary reopens a Decided Match.
+        enum Reopening {
+            /// It was Decided by its winning Point, which Undo removes.
+            case undo
+            /// It was stopped or Ended early, so play picks up where it stood.
+            case resume
+        }
+
+        /// The summary's way back into play: Undo after a winning Point, Resume otherwise.
+        var summaryReopening: Reopening { match.score.isDecided ? .undo : .resume }
+
+        /// Reopens a Match that was stopped or Ended early, in the same workout, and saves; a Match
+        /// Decided by its winning Point is reopened by Undo instead.
+        func resume() {
+            guard state == .decided, summaryReopening == .resume else { return }
+            state = .inProgress
+            decidedAt = nil
+            save()
+        }
+
+        /// From the first Point to Decided, while the Match is Decided.
+        var duration: Duration? {
+            guard let decidedAt, let firstPoint = points.first?.timestamp else { return nil }
+            return .seconds(decidedAt.timeIntervalSince(firstPoint))
+        }
+
         /// End match stops a Match before it is Decided; once Decided, only its summary leads on.
         var canEnd: Bool { state == .inProgress }
 

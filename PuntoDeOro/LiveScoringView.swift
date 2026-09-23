@@ -23,7 +23,7 @@ struct LiveScoringView: View {
             VStack(spacing: 0) {
                 topBar
                 half(.them, score: score, height: halfHeight)
-                strip(match, score: score, showsResult: record.state == .decided)
+                strip(match, score: score)
                 half(.us, score: score, height: halfHeight)
             }
         }
@@ -83,7 +83,7 @@ struct LiveScoringView: View {
     /// and a Super tie-break replacing the third Set has no Games to show. At a Deciding point the
     /// whole strip turns gold, the one place the app spends it, and everything on it goes black to
     /// stay legible.
-    private func strip(_ match: Match, score: Score, showsResult: Bool) -> some View {
+    private func strip(_ match: Match, score: Score) -> some View {
         let isDecidingPoint = score.isDecidingPoint
         return HStack(spacing: 10) {
             ForEach(score.sets.indices, id: \.self) { index in
@@ -93,7 +93,7 @@ struct LiveScoringView: View {
             if !score.isDecided && !score.isThirdSetSuperTieBreak {
                 gamesColumn(score.games, isDecidingPoint: isDecidingPoint)
             }
-            let statuses = statusLabels(match, score: score, showsResult: showsResult)
+            let statuses = statusLabels(match, score: score)
             if !statuses.isEmpty {
                 VStack(spacing: 0) {
                     ForEach(statuses, id: \.self) { status in
@@ -121,16 +121,8 @@ struct LiveScoringView: View {
 
     /// The strip's status, one label per line: the Deuce rule's name at a Deciding point, else
     /// `TIE-BREAK` or `SUPER TIE-BREAK` while one is played, stacked over `CHANGE ENDS` until the
-    /// next Point. Once the record is Decided, including a Match Ended early and saved, whose score
-    /// is not, a placeholder names its Result until the summary screen lands.
-    private func statusLabels(_ match: Match, score: Score, showsResult: Bool) -> [String] {
-        if showsResult {
-            switch score.result {
-            case .won(let winner): return ["\(winner.name.uppercased()) WIN"]
-            case .draw: return ["DRAW"]
-            case .unfinished: return ["UNFINISHED"]
-            }
-        }
+    /// next Point.
+    private func statusLabels(_ match: Match, score: Score) -> [String] {
         if score.isDecidingPoint { return [match.rules.deuceRule.name.uppercased()] }
         var labels: [String] = []
         switch score.tieBreak {

@@ -221,6 +221,70 @@ final class MatchRecordTests {
         #expect(relaunched.match.score.result == .won(.us))
     }
 
+    // MARK: - The summary
+
+    @Test func aMatchDecidedByItsWinningPointIsReopenedByUndoNotResume() throws {
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch(), workout: workout)
+        for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
+        #expect(record.summaryReopening == .undo)
+        workout.calls.removeAll()
+
+        record.resume()
+
+        #expect(record.state == .decided)
+        #expect(record.match.points.count == 36)
+
+        record.undo()
+
+        #expect(record.state == .inProgress)
+        #expect(record.match.points.count == 35)
+        #expect(workout.calls.isEmpty)
+    }
+
+    @Test(arguments: [Rules(), Rules(format: .infinite)])
+    func resumeReopensAStoppedMatchInTheSameWorkout(rules: Rules) throws {
+        let record = MatchRecord.start(rules, in: try relaunch(), workout: workout)
+        for team in gamesToLove(.them, 1) + [.us] { record.scorePoint(for: team) }
+        record.endAndSave()
+        #expect(record.summaryReopening == .resume)
+        workout.calls.removeAll()
+
+        record.resume()
+
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.state == .inProgress)
+        #expect(relaunched.decidedAt == nil)
+        #expect(relaunched.match.points.map(\.winner) == gamesToLove(.them, 1) + [.us])
+        #expect(workout.calls.isEmpty)
+        record.scorePoint(for: .us)
+        #expect(record.match.score.points(.us) == "30")
+    }
+
+    @Test func aMatchInProgressOrFinishedIsNotResumed() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        record.scorePoint(for: .us)
+        record.resume()
+        #expect(record.state == .inProgress)
+
+        record.endAndSave()
+        record.finish(workout: workout)
+        record.resume()
+
+        #expect(record.state == .finished)
+    }
+
+    @Test func theDurationRunsFromTheFirstPointToDecided() throws {
+        let record = MatchRecord.start(Rules(), at: Date(timeIntervalSinceReferenceDate: 0), in: try relaunch(), workout: workout)
+        #expect(record.duration == nil)
+        let firstPoint = Date(timeIntervalSinceReferenceDate: 600)
+        record.scorePoint(for: .us, at: firstPoint)
+        record.scorePoint(for: .them, at: firstPoint + 60)
+
+        record.endAndSave(at: firstPoint + 3_725)
+
+        #expect(record.duration == .seconds(3_725))
+    }
+
     // MARK: - The workout
 
     @Test func startingAMatchBeginsItsWorkoutAtTheStart() throws {
@@ -398,6 +462,7 @@ final class WorkoutSpy: MatchWorkout {
     }
 
     var calls: [Call] = []
+    var stats = WorkoutStats()
 
     func begin(at startDate: Date) { calls.append(.begin(startDate)) }
     func keepRunning() { calls.append(.keepRunning) }

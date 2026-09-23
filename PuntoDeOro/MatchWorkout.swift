@@ -18,6 +18,26 @@ protocol MatchWorkout: AnyObject {
     func end(at decidedAt: Date)
     /// Throws the workout away with an Abandoned Match, writing nothing to Health.
     func discard()
+    /// What the running workout has measured so far, for the summary.
+    var stats: WorkoutStats { get }
+}
+
+/// What a Match's workout has measured: active energy and average heart rate, each nil until the
+/// sensors report it.
+struct WorkoutStats: Equatable {
+    /// Kilocalories.
+    var activeEnergy: Double?
+    /// Beats per minute.
+    var averageHeartRate: Double?
+
+    /// The summary's one stats line.
+    var line: String {
+        "\(Self.rounded(activeEnergy)) kcal · \(Self.rounded(averageHeartRate)) bpm avg"
+    }
+
+    private static func rounded(_ value: Double?) -> String {
+        value.map { "\(Int($0.rounded()))" } ?? "–"
+    }
 }
 
 /// A Match's workout, run as an `HKWorkoutSession` with a live builder. One Match makes one Health entry.
@@ -100,6 +120,15 @@ final class HealthWorkout: NSObject, MatchWorkout {
             isWanted = false
             await discardSession()
         }
+    }
+
+    var stats: WorkoutStats {
+        WorkoutStats(
+            activeEnergy: builder?.statistics(for: HKQuantityType(.activeEnergyBurned))?
+                .sumQuantity()?.doubleValue(for: .kilocalorie()),
+            averageHeartRate: builder?.statistics(for: HKQuantityType(.heartRate))?
+                .averageQuantity()?.doubleValue(for: .count().unitDivided(by: .minute()))
+        )
     }
 
     private func startSession(at startDate: Date) async throws {
@@ -222,6 +251,7 @@ final class NoWorkout: MatchWorkout {
     func keepRunning() {}
     func end(at decidedAt: Date) {}
     func discard() {}
+    var stats: WorkoutStats { WorkoutStats() }
 }
 
 extension EnvironmentValues {

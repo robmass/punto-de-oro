@@ -4,8 +4,9 @@ import SwiftUI
 /// The scene root: the single non-Finished Match opens straight into live scoring, score intact;
 /// with none on disk, the setup wizard replaces it. Setup is swapped in and out here, never pushed,
 /// so no back-swipe can reach it mid-match. Nothing else is restored, so a relaunch always lands on
-/// the live page. Each time the app comes to the front, launch included, the current Match is
-/// recovered: back on a workout, or ended if it was left.
+/// the live page. Once the Match is Decided its summary takes the place of the pages, still inside
+/// its workout, until it is Finished. Each time the app comes to the front, launch included, the
+/// current Match is recovered: back on a workout, or ended if it was left.
 struct RootView: View {
     @Query(MatchRecord.currentDescriptor) private var current: [MatchRecord]
     @Query(MatchRecord.latestDescriptor) private var latest: [MatchRecord]
@@ -16,7 +17,11 @@ struct RootView: View {
     var body: some View {
         Group {
             if let record = current.first {
-                MatchPagesView(record: record)
+                if record.state == .decided {
+                    SummaryView(record: record)
+                } else {
+                    MatchPagesView(record: record)
+                }
             } else {
                 SetupWizardView(lastRules: latest.first?.rules)
             }
