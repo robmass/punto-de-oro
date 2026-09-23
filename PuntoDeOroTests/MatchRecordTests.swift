@@ -301,18 +301,106 @@ final class MatchRecordTests {
 
         #expect(workout.calls.isEmpty)
     }
+
+    // MARK: - Recovery
+
+    @Test func aRecentMatchComesBackInProgressOnItsWorkout() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        let played = Date(timeIntervalSinceReferenceDate: 1_000)
+        for (offset, team) in [Team.us, .them, .us].enumerated() {
+            record.scorePoint(for: team, at: played + Double(offset))
+        }
+        workout.calls.removeAll()
+
+        let context = try relaunch()
+        MatchRecord.recoverCurrent(in: context, workout: workout, at: played + 2 + 60 * 60)
+
+        let recovered = try #require(try MatchRecord.current(in: context))
+        #expect(recovered.state == .inProgress)
+        #expect(recovered.match.points.map(\.winner) == [.us, .them, .us])
+        #expect(workout.calls == [.keepRunning])
+    }
+
+    @Test func aMatchLeftMoreThanSixHoursIsEndedAndSavedAtItsLastPoint() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        let lastPoint = Date(timeIntervalSinceReferenceDate: 1_000)
+        for team in gamesToLove(.us, 1) { record.scorePoint(for: team, at: lastPoint - 60) }
+        record.scorePoint(for: .them, at: lastPoint)
+        workout.calls.removeAll()
+
+        MatchRecord.recoverCurrent(in: try relaunch(), workout: workout, at: lastPoint + 6 * 60 * 60 + 1)
+
+        let recovered = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(recovered.state == .decided)
+        #expect(recovered.decidedAt == lastPoint)
+        #expect(recovered.match.score.result == .unfinished)
+        #expect(recovered.match.points.count == 5)
+        #expect(workout.calls.isEmpty)
+    }
+
+    @Test func anEmptyMatchLeftMoreThanSixHoursIsAbandoned() throws {
+        let startDate = Date(timeIntervalSinceReferenceDate: 1_000)
+        MatchRecord.start(Rules(), at: startDate, in: try relaunch(), workout: workout)
+        workout.calls.removeAll()
+
+        MatchRecord.recoverCurrent(in: try relaunch(), workout: workout, at: startDate + 6 * 60 * 60 + 1)
+
+        #expect(try relaunch().fetch(FetchDescriptor<MatchRecord>()).isEmpty)
+        #expect(workout.calls == [.discard])
+    }
+
+    @Test func aMatchIsLeftOnlyAfterMoreThanSixHoursWithoutAPoint() throws {
+        let startDate = Date(timeIntervalSinceReferenceDate: 1_000)
+        let record = MatchRecord.start(Rules(), at: startDate, in: try relaunch(), workout: workout)
+        let lastPoint = startDate + 5 * 60 * 60
+        record.scorePoint(for: .us, at: lastPoint)
+        workout.calls.removeAll()
+
+        MatchRecord.recoverCurrent(in: try relaunch(), workout: workout, at: lastPoint + 6 * 60 * 60)
+
+        let recovered = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(recovered.state == .inProgress)
+        #expect(workout.calls == [.keepRunning])
+    }
+
+    @Test func aStaleMatchIsEndedOnceAndItsSummaryNeverRecoversAWorkout() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        let lastPoint = Date(timeIntervalSinceReferenceDate: 1_000)
+        record.scorePoint(for: .us, at: lastPoint)
+        MatchRecord.recoverCurrent(in: try relaunch(), workout: workout, at: lastPoint + 7 * 60 * 60)
+        workout.calls.removeAll()
+
+        MatchRecord.recoverCurrent(in: try relaunch(), workout: workout, at: lastPoint + 30 * 60 * 60)
+
+        let recovered = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(recovered.state == .decided)
+        #expect(recovered.decidedAt == lastPoint)
+        #expect(workout.calls.isEmpty)
+    }
+
+    /// A workout HealthKit recovers after the app died mid-Abandon or mid-Finish has no Match left to
+    /// run under, and would otherwise keep the app in front for good.
+    @Test func withNoMatchCurrentNoWorkoutIsKeptRunning() throws {
+        MatchRecord.start(Rules(), in: try relaunch(), workout: workout).finish(workout: workout)
+        workout.calls.removeAll()
+
+        MatchRecord.recoverCurrent(in: try relaunch(), workout: workout)
+
+        #expect(workout.calls == [.discard])
+    }
 }
 
 /// Records what a Match asked of its workout, in order.
 @MainActor
 final class WorkoutSpy: MatchWorkout {
     enum Call: Equatable {
-        case begin(Date), end(Date), discard
+        case begin(Date), keepRunning, end(Date), discard
     }
 
     var calls: [Call] = []
 
     func begin(at startDate: Date) { calls.append(.begin(startDate)) }
+    func keepRunning() { calls.append(.keepRunning) }
     func end(at decidedAt: Date) { calls.append(.end(decidedAt)) }
     func discard() { calls.append(.discard) }
 }

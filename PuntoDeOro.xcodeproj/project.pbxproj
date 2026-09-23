@@ -22,6 +22,7 @@
 		EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0820ACD0049B3EF42241B96D /* LiveScoringView.swift */; };
 		F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */; };
 		F7C8AD2848B497CB5C7CAF3B /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F453426AF151D2F08C069BBA /* RootView.swift */; };
+		FAE2160B29E1AB0A496AE4DE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardTests.swift; sourceTree = "<group>"; };
 		8B751D83F59BF072BE01CE1C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		96177AC9FC687A49A1A2390A /* PuntoDeOro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PuntoDeOro.entitlements; sourceTree = "<group>"; };
+		A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
 		C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuntoDeOroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeuceRuleTests.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 		CA1F31394513A753031BBA21 /* PuntoDeOro */ = {
 			isa = PBXGroup;
 			children = (
+				A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */,
 				35FF2E5F1FFC20012592FC29 /* Info.plist */,
 				0820ACD0049B3EF42241B96D /* LiveScoringView.swift */,
 				8B751D83F59BF072BE01CE1C /* Match.swift */,
@@ -201,6 +204,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAE2160B29E1AB0A496AE4DE /* AppDelegate.swift in Sources */,
 				EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */,
 				4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */,
 				5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */,

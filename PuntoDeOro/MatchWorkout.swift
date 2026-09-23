@@ -10,6 +10,9 @@ import SwiftUI
 protocol MatchWorkout: AnyObject {
     /// Starts the workout as the Match starts.
     func begin(at startDate: Date)
+    /// Keeps a workout running under the current Match: the one HealthKit recovered after a crash,
+    /// or, when it was lost (a reboot), a fresh one from now.
+    func keepRunning()
     /// Ends and saves the workout at Finished, backdated to the Decided moment so the time spent
     /// reading the summary is not counted as play.
     func end(at decidedAt: Date)
@@ -26,6 +29,9 @@ final class HealthWorkout: NSObject, MatchWorkout {
     /// Each change waits for the one before, so a Discard made while authorization is still being
     /// asked cannot overtake the Start it follows.
     private var lastChange: Task<Void, Never>?
+    /// Whether a Match wants the workout running, as last said; unknown after a launch until the
+    /// current Match has been recovered.
+    private var isWanted: Bool?
     /// Each ending session's wait, resumed once it reaches `.ended`.
     private var sessionsEnding: [ObjectIdentifier: CheckedContinuation<Void, Never>] = [:]
 
@@ -43,37 +49,45 @@ final class HealthWorkout: NSObject, MatchWorkout {
 
     func begin(at startDate: Date) {
         change { [self] in
+            isWanted = true
             // A workout left running would make a second Health entry, so it goes first.
-            if let (session, builder) = takeSession() {
-                await endSession(session)
-                builder.discardWorkout()
+            await discardSession()
+            try await startSession(at: startDate)
+        }
+    }
+
+    func keepRunning() {
+        change { [self] in
+            isWanted = true
+            guard session == nil else { return }
+            // Asked here too, not only in `recover()`: whichever runs first after a crash takes the
+            // recovered workout, so a fresh one never starts in its place.
+            if let recovered = await recoveredSession() {
+                attach(recovered)
+            } else {
+                // Starting now, not at the Match's start: a fresh workout cannot claim the time the
+                // lost one covered.
+                try await startSession(at: .now)
             }
-            try await store.requestAuthorization(toShare: Self.typesToShare, read: Self.typesToRead)
-            let configuration = HKWorkoutConfiguration()
-            // There is no padel type in `HKWorkoutActivityType`; `.paddleSports` is canoe, kayak and
-            // SUP, so padel is logged as its closest racket sport. Calorimetry is sensor-estimated for
-            // every racket sport, so this only sets the label and icon in Fitness and Health. Re-check
-            // the enumeration each WWDC in case Apple adds padel.
-            configuration.activityType = .tennis
-            configuration.locationType = .indoor
-            let session = try HKWorkoutSession(healthStore: store, configuration: configuration)
-            let builder = session.associatedWorkoutBuilder()
-            builder.dataSource = HKLiveWorkoutDataSource(healthStore: store, workoutConfiguration: configuration)
-            session.delegate = self
-            session.startActivity(with: startDate)
-            do {
-                try await builder.beginCollection(at: startDate)
-            } catch {
-                await endSession(session)
-                throw error
-            }
-            self.session = session
-            self.builder = builder
+        }
+    }
+
+    /// Takes back the session HealthKit kept running when the app crashed mid-Match. HealthKit hands
+    /// back a new session object and restores only the workout; the score comes back from the Match
+    /// record.
+    func recover() {
+        change { [self] in
+            guard session == nil, let recovered = await recoveredSession() else { return }
+            attach(recovered)
+            // The app died between a Match leaving and its workout doing so: nothing is left for the
+            // workout to run under.
+            if isWanted == false { await discardSession() }
         }
     }
 
     func end(at decidedAt: Date) {
         change { [self] in
+            isWanted = false
             guard let (session, builder) = takeSession() else { return }
             await endSession(session)
             try await builder.endCollection(at: decidedAt)
@@ -83,13 +97,64 @@ final class HealthWorkout: NSObject, MatchWorkout {
 
     func discard() {
         change { [self] in
-            guard let (session, builder) = takeSession() else { return }
-            await endSession(session)
-            builder.discardWorkout()
+            isWanted = false
+            await discardSession()
         }
     }
 
+    private func startSession(at startDate: Date) async throws {
+        try await store.requestAuthorization(toShare: Self.typesToShare, read: Self.typesToRead)
+        let configuration = HKWorkoutConfiguration()
+        // There is no padel type in `HKWorkoutActivityType`; `.paddleSports` is canoe, kayak and
+        // SUP, so padel is logged as its closest racket sport. Calorimetry is sensor-estimated for
+        // every racket sport, so this only sets the label and icon in Fitness and Health. Re-check
+        // the enumeration each WWDC in case Apple adds padel.
+        configuration.activityType = .tennis
+        configuration.locationType = .indoor
+        let session = try HKWorkoutSession(healthStore: store, configuration: configuration)
+        let builder = attach(session)
+        session.startActivity(with: startDate)
+        do {
+            try await builder.beginCollection(at: startDate)
+        } catch {
+            takeSession()
+            await endSession(session)
+            throw error
+        }
+    }
+
+    /// The session HealthKit kept running through a crash, if any.
+    private func recoveredSession() async -> HKWorkoutSession? {
+        do {
+            return try await store.recoverActiveWorkoutSession()
+        } catch {
+            Logger.workout.error("Could not recover the workout: \(error)")
+            return nil
+        }
+    }
+
+    /// Makes a session the running one, with its builder collecting live from the watch's sensors.
+    @discardableResult
+    private func attach(_ session: HKWorkoutSession) -> HKLiveWorkoutBuilder {
+        let builder = session.associatedWorkoutBuilder()
+        builder.dataSource = HKLiveWorkoutDataSource(
+            healthStore: store,
+            workoutConfiguration: session.workoutConfiguration
+        )
+        session.delegate = self
+        self.session = session
+        self.builder = builder
+        return builder
+    }
+
+    private func discardSession() async {
+        guard let (session, builder) = takeSession() else { return }
+        await endSession(session)
+        builder.discardWorkout()
+    }
+
     /// The running session and its builder, handed over once so a Match ends its workout only once.
+    @discardableResult
     private func takeSession() -> (HKWorkoutSession, HKLiveWorkoutBuilder)? {
         defer { (session, builder) = (nil, nil) }
         guard let session, let builder else { return nil }
@@ -154,6 +219,7 @@ final class NoWorkout: MatchWorkout {
     nonisolated init() {}
 
     func begin(at startDate: Date) {}
+    func keepRunning() {}
     func end(at decidedAt: Date) {}
     func discard() {}
 }

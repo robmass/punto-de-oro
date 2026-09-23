@@ -3,8 +3,8 @@ import SwiftUI
 
 @main
 struct PuntoDeOroApp: App {
+    @WKApplicationDelegateAdaptor private var appDelegate: AppDelegate
     private let container: ModelContainer
-    private let workout = HealthWorkout()
 
     init() {
         do {
@@ -19,6 +19,6 @@ struct PuntoDeOroApp: App {
             RootView()
         }
         .modelContainer(container)
-        .environment(\.workout, workout)
+        .environment(\.workout, appDelegate.workout)
     }
 }

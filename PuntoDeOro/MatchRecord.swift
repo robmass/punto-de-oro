@@ -88,6 +88,36 @@ enum MatchSchemaV1: VersionedSchema {
             return try context.fetch(descriptor).first
         }
 
+        /// Brings the current Match back as the app comes to the front, whether it was relaunched after a
+        /// crash or reboot or woken from a bag: an in-progress Match keeps its workout running, unless
+        /// it has gone stale, left more than `staleAfter` since its last Point (or its start, with none
+        /// played). Then End match applies as if chosen: Save, Decided where it stood, or with an empty
+        /// Point log, a silent Abandon. With no Match current, no workout is kept running.
+        @MainActor
+        static func recoverCurrent(in context: ModelContext, workout: some MatchWorkout, at now: Date = .now) {
+            guard let record = try? current(in: context) else {
+                workout.discard()
+                return
+            }
+            guard record.state == .inProgress else { return }
+            let lastPlayed = record.points.last?.timestamp ?? record.startDate
+            guard now.timeIntervalSince(lastPlayed) > staleAfter else {
+                workout.keepRunning()
+                return
+            }
+            if record.endNeedsConfirmation {
+                // Decided at the last Point, so neither the Duration nor the workout counts the hours
+                // the Match lay idle.
+                record.endAndSave(at: lastPlayed)
+            } else {
+                record.abandon(workout: workout)
+            }
+        }
+
+        /// How long a Match can go without a Point before it is stale: taken to have been left, not
+        /// paused, since there is no pause.
+        static let staleAfter: TimeInterval = 6 * 60 * 60
+
         /// The most recent record, Finished or not: the source of the last Rules, so they need no
         /// separate store.
         static var latestDescriptor: FetchDescriptor<MatchRecord> {
