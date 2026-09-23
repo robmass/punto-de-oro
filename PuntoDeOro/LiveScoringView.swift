@@ -5,6 +5,9 @@ import SwiftUI
 /// Undo goes through the record, which saves it.
 struct LiveScoringView: View {
     let record: MatchRecord
+    /// Double Tap is Undo only while the live page is selected: the shortcut resolves leading to
+    /// trailing, and the controls page is leading.
+    let isPrimaryActionEnabled: Bool
     @State private var toast: String?
 
     /// Pinned on every watch; the halves split the remainder. The top bar is tall enough to
@@ -20,7 +23,7 @@ struct LiveScoringView: View {
             VStack(spacing: 0) {
                 topBar
                 half(.them, score: score, height: halfHeight)
-                strip(match, score: score)
+                strip(match, score: score, showsResult: record.state == .decided)
                 half(.us, score: score, height: halfHeight)
             }
         }
@@ -39,6 +42,7 @@ struct LiveScoringView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .handGestureShortcut(.primaryAction, isEnabled: isPrimaryActionEnabled)
             .accessibilityLabel("Undo")
             Spacer()
         }
@@ -79,7 +83,7 @@ struct LiveScoringView: View {
     /// and a Super tie-break replacing the third Set has no Games to show. At a Deciding point the
     /// whole strip turns gold, the one place the app spends it, and everything on it goes black to
     /// stay legible.
-    private func strip(_ match: Match, score: Score) -> some View {
+    private func strip(_ match: Match, score: Score, showsResult: Bool) -> some View {
         let isDecidingPoint = score.isDecidingPoint
         return HStack(spacing: 10) {
             ForEach(score.sets.indices, id: \.self) { index in
@@ -89,7 +93,7 @@ struct LiveScoringView: View {
             if !score.isDecided && !score.isThirdSetSuperTieBreak {
                 gamesColumn(score.games, isDecidingPoint: isDecidingPoint)
             }
-            let statuses = statusLabels(match, score: score)
+            let statuses = statusLabels(match, score: score, showsResult: showsResult)
             if !statuses.isEmpty {
                 VStack(spacing: 0) {
                     ForEach(statuses, id: \.self) { status in
@@ -117,10 +121,16 @@ struct LiveScoringView: View {
 
     /// The strip's status, one label per line: the Deuce rule's name at a Deciding point, else
     /// `TIE-BREAK` or `SUPER TIE-BREAK` while one is played, stacked over `CHANGE ENDS` until the
-    /// next Point. Once the Match is Decided, a placeholder names the winner until the summary
-    /// screen lands.
-    private func statusLabels(_ match: Match, score: Score) -> [String] {
-        if let winner = score.winner { return ["\(winner.name.uppercased()) WIN"] }
+    /// next Point. Once the record is Decided, including a Match Ended early and saved, whose score
+    /// is not, a placeholder names its Result until the summary screen lands.
+    private func statusLabels(_ match: Match, score: Score, showsResult: Bool) -> [String] {
+        if showsResult {
+            switch score.result {
+            case .won(let winner): return ["\(winner.name.uppercased()) WIN"]
+            case .draw: return ["DRAW"]
+            case .unfinished: return ["UNFINISHED"]
+            }
+        }
         if score.isDecidingPoint { return [match.rules.deuceRule.name.uppercased()] }
         var labels: [String] = []
         switch score.tieBreak {
@@ -187,14 +197,14 @@ private func previewRecord(_ rules: Rules = Rules(), pointsWonBy winners: [Team]
 }
 
 #Preview("3 sets") {
-    LiveScoringView(record: previewRecord())
+    LiveScoringView(record: previewRecord(), isPrimaryActionEnabled: true)
 }
 
 #Preview("Golden point") {
     LiveScoringView(record: previewRecord(
         Rules(deuceRule: .goldenPoint),
         pointsWonBy: [.us, .us, .us, .them, .them, .them]
-    ))
+    ), isPrimaryActionEnabled: true)
 }
 
 #Preview("Super tie-break") {
@@ -202,14 +212,14 @@ private func previewRecord(_ rules: Rules = Rules(), pointsWonBy winners: [Team]
     LiveScoringView(record: previewRecord(
         Rules(format: .twoSetsPlusSuperTieBreak),
         pointsWonBy: oneSetAll + [.us, .them, .us]
-    ))
+    ), isPrimaryActionEnabled: true)
 }
 
 #Preview("Infinite") {
     LiveScoringView(record: previewRecord(
         Rules(format: .infinite),
         pointsWonBy: [Team](repeating: .them, count: 44) + [.us, .us]
-    ))
+    ), isPrimaryActionEnabled: true)
 }
 
 #Preview("Change ends in a super tie-break") {
@@ -217,5 +227,5 @@ private func previewRecord(_ rules: Rules = Rules(), pointsWonBy winners: [Team]
     LiveScoringView(record: previewRecord(
         Rules(format: .twoSetsPlusSuperTieBreak),
         pointsWonBy: oneSetAll + [.us, .them, .us, .them, .us, .them]
-    ))
+    ), isPrimaryActionEnabled: true)
 }

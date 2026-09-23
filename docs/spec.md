@@ -435,6 +435,12 @@ first time a thumb brushes sideways.
 **Spec condition: the index must overlay, never participate in layout.** If it would shift the
 halves even by a point, hide it instead. Nothing may move under a blind tap.
 
+**As built:** the system `.page` indicator does overlay without moving the halves, but on watchOS
+it stays visible at rest, over the US label. So the system indicator is hidden, and the app draws
+its own overlay dots. They fade in as the page lands and out a second later. The TabView reports
+only the page it lands on, not a drag in progress, so the dots follow the page change rather than
+the thumb.
+
 ### Double Tap guard — required, not a preference
 
 `handGestureShortcut(.primaryAction)` resolves **leading-to-trailing in the active scene**, and

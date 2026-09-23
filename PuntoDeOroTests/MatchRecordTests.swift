@@ -146,4 +146,76 @@ final class MatchRecordTests {
         #expect(kept.match.points.count == 36)
         #expect(kept.decidedAt != nil)
     }
+
+    @Test func savingAnEndedSetBasedMatchDecidesItUnfinished() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch())
+        for team in gamesToLove(.us, 1) + [.them, .them] { record.scorePoint(for: team) }
+        #expect(record.endNeedsConfirmation)
+        let endedAt = Date(timeIntervalSinceReferenceDate: 3_000)
+
+        record.endAndSave(at: endedAt)
+
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.state == .decided)
+        #expect(relaunched.decidedAt == endedAt)
+        #expect(relaunched.match.score.result == .unfinished)
+        #expect(relaunched.match.points.count == 6)
+    }
+
+    @Test func savingAnEndedInfiniteMatchKeepsItsNormalResult() throws {
+        let record = MatchRecord.start(Rules(format: .infinite), in: try relaunch())
+        for team in gamesToLove(.them, 2) + gamesToLove(.us, 1) + [.us, .us] { record.scorePoint(for: team) }
+
+        record.endAndSave()
+
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.state == .decided)
+        #expect(relaunched.match.score.result == .won(.them))
+    }
+
+    @Test func aMatchEndedAndSavedTakesNoMorePoints() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch())
+        record.scorePoint(for: .us)
+        record.endAndSave()
+
+        record.scorePoint(for: .them)
+
+        #expect(record.match.points.map(\.winner) == [.us])
+        #expect(record.state == .decided)
+    }
+
+    @Test func abandoningAMatchLeavesNoRecord() throws {
+        let context = try relaunch()
+        MatchRecord.start(Rules(), in: context).finish()
+        let record = MatchRecord.start(Rules(deuceRule: .goldenPoint), in: context)
+        record.scorePoint(for: .them)
+
+        record.abandon()
+
+        #expect(try MatchRecord.current(in: relaunch()) == nil)
+        let kept = try relaunch().fetch(FetchDescriptor<MatchRecord>())
+        #expect(kept.map(\.rules) == [Rules()])
+    }
+
+    @Test func anEmptyMatchNeedsNoConfirmationToEnd() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch())
+        #expect(!record.endNeedsConfirmation)
+        record.scorePoint(for: .us)
+        record.undo()
+        #expect(!record.endNeedsConfirmation)
+    }
+
+    @Test func aDecidedMatchCanNoLongerBeEnded() throws {
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
+        for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
+        let decidedAt = record.decidedAt
+        #expect(!record.canEnd)
+
+        record.endAndSave()
+        record.abandon()
+
+        let relaunched = try #require(try MatchRecord.current(in: relaunch()))
+        #expect(relaunched.decidedAt == decidedAt)
+        #expect(relaunched.match.score.result == .won(.us))
+    }
 }

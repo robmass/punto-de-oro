@@ -11,7 +11,7 @@ struct RootView: View {
 
     var body: some View {
         if let record = current.first {
-            LiveScoringView(record: record)
+            MatchPagesView(record: record)
         } else {
             SetupWizardView(lastRules: latest.first?.rules)
         }

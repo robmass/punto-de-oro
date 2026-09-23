@@ -89,17 +89,15 @@ enum MatchSchemaV1: VersionedSchema {
             return descriptor
         }
 
-        /// Scores a Point and saves it; the winning Point makes the Match Decided.
+        /// Scores a Point and saves it; the winning Point makes the Match Decided. A Decided Match
+        /// takes no Points, including one Ended early, whose score never shows it Decided.
         func scorePoint(for team: Team, at timestamp: Date = .now) {
-            guard state != .finished else { return }
+            guard state == .inProgress else { return }
             var match = match
             match.scorePoint(for: team, at: timestamp)
             guard match.points.count != points.count else { return }
             points = match.points
-            if match.score.isDecided {
-                state = .decided
-                decidedAt = timestamp
-            }
+            if match.score.isDecided { decide(at: timestamp) }
             save()
         }
 
@@ -117,10 +115,42 @@ enum MatchSchemaV1: VersionedSchema {
             return toast
         }
 
+        /// End match stops a Match before it is Decided; once Decided, only its summary leads on.
+        var canEnd: Bool { state == .inProgress }
+
+        /// Whether End match asks to Save or Discard; with an empty Point log it abandons silently.
+        var endNeedsConfirmation: Bool { !points.isEmpty }
+
+        /// End match → Save: the Match is Decided where it stands. Its Result is Unfinished in a
+        /// set-based Format; an Infinite match keeps its normal Result.
+        func endAndSave(at timestamp: Date = .now) {
+            guard canEnd else { return }
+            decide(at: timestamp)
+            save()
+        }
+
+        /// End match → Discard: the Match is Abandoned and leaves no record behind.
+        func abandon() {
+            // The context is held here rather than going through `save()`, which reaches it through
+            // the record being deleted.
+            guard canEnd, let context = modelContext else { return }
+            context.delete(self)
+            do {
+                try context.save()
+            } catch {
+                Logger.persistence.error("Could not abandon the Match: \(error)")
+            }
+        }
+
         /// The players have left the summary: the Match is final and no longer current.
         func finish() {
             state = .finished
             save()
+        }
+
+        private func decide(at timestamp: Date) {
+            state = .decided
+            decidedAt = timestamp
         }
 
         /// Written straight away rather than left to autosave, so force-quitting loses no Points.
