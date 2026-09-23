@@ -27,22 +27,17 @@ extension Match {
     var stripStatuses: [String] {
         let score = score
         if score.isDecidingPoint { return [rules.deuceRule.name] }
-        var statuses: [String] = []
-        switch score.tieBreak {
-        case .tieBreak: statuses.append("Tie-break")
-        case .superTieBreak: statuses.append("Super tie-break")
-        case nil: break
-        }
+        var statuses = [score.tieBreak?.name].compactMap(\.self)
         if score.isChangeOfEnds { statuses.append("Change ends") }
         return statuses
     }
 
     /// The whole strip as one element, "Games 4-3. Sets, Us 6-4. Golden point.": Us first
-    /// throughout, as the summary reads, and only what the strip shows.
+    /// throughout, as on the summary, and only what the strip shows.
     var spokenStrip: String {
         let score = score
         var sentences: [String] = []
-        if !score.isDecided && !score.isThirdSetSuperTieBreak {
+        if score.showsCurrentGames {
             sentences.append("Games \(score.games(.us))-\(score.games(.them))")
         }
         if !score.sets.isEmpty {

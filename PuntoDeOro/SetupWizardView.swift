@@ -174,7 +174,6 @@ private extension Format {
 }
 
 private extension TieBreak {
-    var name: String { self == .tieBreak ? "Tie-break" : "Super tie-break" }
     var subtitle: String { self == .tieBreak ? "To 7" : "To 10" }
 }
 

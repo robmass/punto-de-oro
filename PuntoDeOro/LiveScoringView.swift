@@ -16,8 +16,7 @@ struct LiveScoringView: View {
     /// its score and two stacked chips still fit the strip. Everything else on the screen is pinned
     /// to the geometry: the score is already as large as its half allows.
     @ScaledMetric(relativeTo: .caption2) private var teamLabelSize = LiveGeometry.teamLabelSize
-    @ScaledMetric(relativeTo: .caption2) private var chipSize: CGFloat = 11
-    private static let maxChipSize: CGFloat = 13
+    @ScaledMetric(relativeTo: .caption2) private var chipSize = LiveGeometry.chipSize
 
     var body: some View {
         GeometryReader { geometry in
@@ -113,7 +112,7 @@ struct LiveScoringView: View {
                     .opacity(0.6)
                     .layoutPriority(1)
             }
-            if !score.isDecided && !score.isThirdSetSuperTieBreak {
+            if score.showsCurrentGames {
                 gamesColumn(score.games, isDecidingPoint: isDecidingPoint)
                     .layoutPriority(1)
             }
@@ -126,7 +125,7 @@ struct LiveScoringView: View {
                             .minimumScaleFactor(0.7)
                     }
                 }
-                .font(.system(size: min(chipSize, Self.maxChipSize), weight: .bold))
+                .font(.system(size: min(chipSize, LiveGeometry.maxChipSize), weight: .bold))
             }
         }
         .font(.system(size: 15, weight: .semibold).monospacedDigit())

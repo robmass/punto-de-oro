@@ -25,6 +25,7 @@
 		A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */; };
 		A3C0927ABA94EFED8EA74B18 /* LiveStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */; };
 		B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */; };
+		CDB8BFB57F6239E21EA7B892 /* LiveGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9984A001923811A141927DD1 /* LiveGeometry.swift */; };
 		CF4EF9FAC0FCA63DD0B22A3C /* DeuceRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */; };
 		DAA095EDABC75F93CEF6B2CB /* MatchRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B3153C9F371680C540518C /* MatchRecord.swift */; };
 		E2DF27672CD5AC6982791CF8 /* SetupWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76F5A0936AF3110D3BD6EC9 /* SetupWizard.swift */; };
@@ -66,6 +67,7 @@
 		8B751D83F59BF072BE01CE1C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		954A3B517897631856E3D0D5 /* MatchSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSummary.swift; sourceTree = "<group>"; };
 		96177AC9FC687A49A1A2390A /* PuntoDeOro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PuntoDeOro.entitlements; sourceTree = "<group>"; };
+		9984A001923811A141927DD1 /* LiveGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGeometry.swift; sourceTree = "<group>"; };
 		A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
 		BCF82EC252A2329CD731AE82 /* LiveGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGeometryTests.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				39C16C48744614A3D9385ACC /* Haptic.swift */,
 				35FF2E5F1FFC20012592FC29 /* Info.plist */,
 				4F54E54B7E627C6F1DBF5179 /* LiveAccessibility.swift */,
+				9984A001923811A141927DD1 /* LiveGeometry.swift */,
 				0820ACD0049B3EF42241B96D /* LiveScoringView.swift */,
 				D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */,
 				8B751D83F59BF072BE01CE1C /* Match.swift */,
@@ -242,6 +245,7 @@
 				FAE2160B29E1AB0A496AE4DE /* AppDelegate.swift in Sources */,
 				79663A44A10B711A615A98CC /* Haptic.swift in Sources */,
 				FB99E160FAF4C02B93A8DB46 /* LiveAccessibility.swift in Sources */,
+				CDB8BFB57F6239E21EA7B892 /* LiveGeometry.swift in Sources */,
 				EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */,
 				A3C0927ABA94EFED8EA74B18 /* LiveStyle.swift in Sources */,
 				4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */,
