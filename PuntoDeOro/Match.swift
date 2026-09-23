@@ -96,6 +96,8 @@ enum Format: Equatable {
 enum TieBreak: String, CaseIterable {
     case tieBreak, superTieBreak
 
+    var name: String { self == .tieBreak ? "Tie-break" : "Super tie-break" }
+
     fileprivate var pointsToWin: Int { self == .tieBreak ? 7 : 10 }
 }
 
@@ -210,6 +212,10 @@ struct Score {
     var isThirdSetSuperTieBreak: Bool {
         format == .twoSetsPlusSuperTieBreak && sets.count == 2 && !isDecided
     }
+
+    /// Whether the Games of the Set being played are on the strip: not once the Match is Decided,
+    /// and not in a Super tie-break standing in for the third Set, which has none.
+    var showsCurrentGames: Bool { !isDecided && !isThirdSetSuperTieBreak }
 
     /// Whether the next Point wins the Game because the Deuce rule makes this Deuce decisive.
     /// Never under Advantage, and never inside a Tie-break.

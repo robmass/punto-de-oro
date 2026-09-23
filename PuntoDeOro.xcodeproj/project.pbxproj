@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		02178DCD62305B6171C4CABD /* MatchSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */; };
+		1243DEA518E18782B6819F53 /* LiveGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF82EC252A2329CD731AE82 /* LiveGeometryTests.swift */; };
 		183042A81162D036E527E115 /* SetupWizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */; };
 		33EF3132361FC686046AF61F /* MatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9427B1814EC8BE2BF988ACE /* MatchTests.swift */; };
 		3A779DDED68FD441BA0E9639 /* PuntoDeOroLauncherBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0920C4C58109879268D652E8 /* PuntoDeOroLauncherBundle.swift */; };
@@ -16,6 +17,7 @@
 		484A6753801FBF1861DE2F82 /* HapticTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABAC452C10C835680F7BB26 /* HapticTests.swift */; };
 		4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B751D83F59BF072BE01CE1C /* Match.swift */; };
 		56DB16DCC70B84648F277348 /* MatchWorkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA448ADE8DB0F912B621BCE /* MatchWorkout.swift */; };
+		5C6D9393B3D2AF03E387D2D6 /* LiveAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735DF2A71E58FA68159D0673 /* LiveAccessibilityTests.swift */; };
 		5CFFFEEBEED0E7E617C96222 /* PointLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178B522F26D5CC99191F89E3 /* PointLogs.swift */; };
 		5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */; };
 		5E59838A737863895315F5BF /* MatchSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954A3B517897631856E3D0D5 /* MatchSummary.swift */; };
@@ -32,6 +34,7 @@
 		B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */; };
 		C514BAAB94A5937A3FE33C1B /* CourtGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE9ED325A3586775B7708E3 /* CourtGlyph.swift */; };
 		C8248CD2734C3FF24CFBE46F /* PuntoDeOroLauncher.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 79A38E53DB506762998AE334 /* PuntoDeOroLauncher.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CDB8BFB57F6239E21EA7B892 /* LiveGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9984A001923811A141927DD1 /* LiveGeometry.swift */; };
 		CF4EF9FAC0FCA63DD0B22A3C /* DeuceRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */; };
 		DAA095EDABC75F93CEF6B2CB /* MatchRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B3153C9F371680C540518C /* MatchRecord.swift */; };
 		E2DF27672CD5AC6982791CF8 /* SetupWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76F5A0936AF3110D3BD6EC9 /* SetupWizard.swift */; };
@@ -39,6 +42,7 @@
 		F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */; };
 		F7C8AD2848B497CB5C7CAF3B /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F453426AF151D2F08C069BBA /* RootView.swift */; };
 		FAE2160B29E1AB0A496AE4DE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */; };
+		FB99E160FAF4C02B93A8DB46 /* LiveAccessibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F54E54B7E627C6F1DBF5179 /* LiveAccessibility.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,19 +91,23 @@
 		2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecordTests.swift; sourceTree = "<group>"; };
 		35FF2E5F1FFC20012592FC29 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		39C16C48744614A3D9385ACC /* Haptic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptic.swift; sourceTree = "<group>"; };
+		4F54E54B7E627C6F1DBF5179 /* LiveAccessibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAccessibility.swift; sourceTree = "<group>"; };
 		54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSummaryTests.swift; sourceTree = "<group>"; };
 		5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPagesView.swift; sourceTree = "<group>"; };
 		651FC5B85879FD7AAB3F0C69 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardView.swift; sourceTree = "<group>"; };
+		735DF2A71E58FA68159D0673 /* LiveAccessibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAccessibilityTests.swift; sourceTree = "<group>"; };
 		79A38E53DB506762998AE334 /* PuntoDeOroLauncher.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PuntoDeOroLauncher.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FB652EC33ADEB4450F3181E /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardTests.swift; sourceTree = "<group>"; };
 		8B751D83F59BF072BE01CE1C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		954A3B517897631856E3D0D5 /* MatchSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSummary.swift; sourceTree = "<group>"; };
 		96177AC9FC687A49A1A2390A /* PuntoDeOro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PuntoDeOro.entitlements; sourceTree = "<group>"; };
+		9984A001923811A141927DD1 /* LiveGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGeometry.swift; sourceTree = "<group>"; };
 		A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AF29E94C77E5A4053238E7A8 /* CourtGlyphTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourtGlyphTests.swift; sourceTree = "<group>"; };
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
+		BCF82EC252A2329CD731AE82 /* LiveGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGeometryTests.swift; sourceTree = "<group>"; };
 		C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher.swift; sourceTree = "<group>"; };
 		C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuntoDeOroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveStyle.swift; sourceTree = "<group>"; };
@@ -129,6 +137,8 @@
 				D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */,
 				FABAC452C10C835680F7BB26 /* HapticTests.swift */,
 				00C97310DF8415E497CE78C0 /* LauncherTests.swift */,
+				735DF2A71E58FA68159D0673 /* LiveAccessibilityTests.swift */,
+				BCF82EC252A2329CD731AE82 /* LiveGeometryTests.swift */,
 				00B1F9EDE5C2E27EF470DA90 /* LiveStyleTests.swift */,
 				2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */,
 				54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */,
@@ -157,6 +167,8 @@
 				651FC5B85879FD7AAB3F0C69 /* Assets.xcassets */,
 				39C16C48744614A3D9385ACC /* Haptic.swift */,
 				35FF2E5F1FFC20012592FC29 /* Info.plist */,
+				4F54E54B7E627C6F1DBF5179 /* LiveAccessibility.swift */,
+				9984A001923811A141927DD1 /* LiveGeometry.swift */,
 				0820ACD0049B3EF42241B96D /* LiveScoringView.swift */,
 				D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */,
 				8B751D83F59BF072BE01CE1C /* Match.swift */,
@@ -309,6 +321,8 @@
 				484A6753801FBF1861DE2F82 /* HapticTests.swift in Sources */,
 				84641D7C6EFE95F974748C06 /* Launcher.swift in Sources */,
 				3B2C98678BC76D19CF228E84 /* LauncherTests.swift in Sources */,
+				5C6D9393B3D2AF03E387D2D6 /* LiveAccessibilityTests.swift in Sources */,
+				1243DEA518E18782B6819F53 /* LiveGeometryTests.swift in Sources */,
 				92EFF2EF0F6DC0B9E208C64F /* LiveStyleTests.swift in Sources */,
 				B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */,
 				02178DCD62305B6171C4CABD /* MatchSummaryTests.swift in Sources */,
@@ -324,6 +338,8 @@
 			files = (
 				FAE2160B29E1AB0A496AE4DE /* AppDelegate.swift in Sources */,
 				79663A44A10B711A615A98CC /* Haptic.swift in Sources */,
+				FB99E160FAF4C02B93A8DB46 /* LiveAccessibility.swift in Sources */,
+				CDB8BFB57F6239E21EA7B892 /* LiveGeometry.swift in Sources */,
 				EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */,
 				A3C0927ABA94EFED8EA74B18 /* LiveStyle.swift in Sources */,
 				4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */,

@@ -716,6 +716,15 @@ to activate), which the "fewest taps" requirement cannot override.
 
 **Bold Text** is honoured everywhere. It changes weight only and never reflows.
 
+**As built:** the strip reads Us first throughout, as the summary does — "Games 4-3" is Us 4,
+Them 3 — and names what it shows and nothing more: the completed Sets, the Games of the Set being
+played, and its chips as words ("Tie-break. Change ends."). A half reads Advantage as the word, not
+the letters "AD". The score is the only thing a half lays out; the US / THEM label is overlaid at
+the half's outer edge, so it cannot move or shrink the score however far it scales. Its cap is the
+gap the score leaves between its digits and that edge — about the default size at 40mm, growing
+with the half on larger watches. The chips cap at 13pt, which keeps two stacked in the strip; a
+chip too wide for its line shrinks rather than truncates, and the Games never give way to it.
+
 *Source: [Sizing and accessibility](https://github.com/robmass/punto-de-oro/issues/10)*
 
 ---
