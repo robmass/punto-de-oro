@@ -36,7 +36,10 @@ struct SummaryView: View {
                 Button("Done") { record.finish(workout: workout) }
                     .padding(.top, 4)
                 switch record.summaryReopening {
-                case .undo: Button("Undo") { record.undo() }
+                case .undo:
+                    Button("Undo") {
+                        if record.undo() != nil { Haptic.play([.directionDown]) }
+                    }
                 case .resume: Button("Resume") { record.resume() }
                 }
             }

@@ -10,11 +10,13 @@
 		02178DCD62305B6171C4CABD /* MatchSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */; };
 		183042A81162D036E527E115 /* SetupWizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */; };
 		33EF3132361FC686046AF61F /* MatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9427B1814EC8BE2BF988ACE /* MatchTests.swift */; };
+		484A6753801FBF1861DE2F82 /* HapticTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABAC452C10C835680F7BB26 /* HapticTests.swift */; };
 		4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B751D83F59BF072BE01CE1C /* Match.swift */; };
 		56DB16DCC70B84648F277348 /* MatchWorkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA448ADE8DB0F912B621BCE /* MatchWorkout.swift */; };
 		5CFFFEEBEED0E7E617C96222 /* PointLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178B522F26D5CC99191F89E3 /* PointLogs.swift */; };
 		5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */; };
 		5E59838A737863895315F5BF /* MatchSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954A3B517897631856E3D0D5 /* MatchSummary.swift */; };
+		79663A44A10B711A615A98CC /* Haptic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C16C48744614A3D9385ACC /* Haptic.swift */; };
 		981E7654B18E4E5FB7825A5E /* SetupWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */; };
 		9F0FC5FD0245C328CA312090 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB652EC33ADEB4450F3181E /* SummaryView.swift */; };
 		A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */; };
@@ -47,6 +49,7 @@
 		29B3153C9F371680C540518C /* MatchRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecord.swift; sourceTree = "<group>"; };
 		2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecordTests.swift; sourceTree = "<group>"; };
 		35FF2E5F1FFC20012592FC29 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		39C16C48744614A3D9385ACC /* Haptic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptic.swift; sourceTree = "<group>"; };
 		54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSummaryTests.swift; sourceTree = "<group>"; };
 		5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPagesView.swift; sourceTree = "<group>"; };
 		6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardView.swift; sourceTree = "<group>"; };
@@ -62,6 +65,7 @@
 		E9427B1814EC8BE2BF988ACE /* MatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchTests.swift; sourceTree = "<group>"; };
 		F453426AF151D2F08C069BBA /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		F76F5A0936AF3110D3BD6EC9 /* SetupWizard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizard.swift; sourceTree = "<group>"; };
+		FABAC452C10C835680F7BB26 /* HapticTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -79,6 +83,7 @@
 			children = (
 				1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */,
 				D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */,
+				FABAC452C10C835680F7BB26 /* HapticTests.swift */,
 				2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */,
 				54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */,
 				E9427B1814EC8BE2BF988ACE /* MatchTests.swift */,
@@ -92,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */,
+				39C16C48744614A3D9385ACC /* Haptic.swift */,
 				35FF2E5F1FFC20012592FC29 /* Info.plist */,
 				0820ACD0049B3EF42241B96D /* LiveScoringView.swift */,
 				8B751D83F59BF072BE01CE1C /* Match.swift */,
@@ -202,6 +208,7 @@
 			files = (
 				F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */,
 				CF4EF9FAC0FCA63DD0B22A3C /* DeuceRuleTests.swift in Sources */,
+				484A6753801FBF1861DE2F82 /* HapticTests.swift in Sources */,
 				B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */,
 				02178DCD62305B6171C4CABD /* MatchSummaryTests.swift in Sources */,
 				33EF3132361FC686046AF61F /* MatchTests.swift in Sources */,
@@ -215,6 +222,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FAE2160B29E1AB0A496AE4DE /* AppDelegate.swift in Sources */,
+				79663A44A10B711A615A98CC /* Haptic.swift in Sources */,
 				EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */,
 				4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */,
 				5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */,

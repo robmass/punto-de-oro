@@ -363,7 +363,7 @@ Undone · point Them · 30–15
 | Point for **Us** | 1 × `.click` |
 | Point for **Them** | 2 × `.click` (~150 ms apart) |
 | Game won | `.success` (replaces the point clicks) |
-| Set / Match won | `.notification` |
+| Set / Match won | `.notification` (replaces the game haptic) |
 | Deciding point reached | `.retry` (after the point haptic) |
 | Change of ends | `.directionUp` (after the game haptic; alongside the point haptic inside a tie-break) |
 | Undo | `.directionDown` |

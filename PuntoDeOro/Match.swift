@@ -109,10 +109,14 @@ struct Match {
         self.points = points
     }
 
-    /// Once the Match is Decided, only Undo changes the Point log.
-    mutating func scorePoint(for team: Team, at timestamp: Date = .now) {
-        guard !score.isDecided else { return }
+    /// Scores a Point and returns the haptics it fires. Once the Match is Decided, only Undo changes
+    /// the Point log, and a Point not scored fires nothing.
+    @discardableResult
+    mutating func scorePoint(for team: Team, at timestamp: Date = .now) -> [Haptic] {
+        let before = score
+        guard !before.isDecided else { return [] }
         points.append(Point(winner: team, timestamp: timestamp))
+        return Haptic.forPoint(by: team, from: before, to: score)
     }
 
     /// Removes the most recent Point and returns the toast naming it, or nil when the log is empty.

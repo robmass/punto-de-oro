@@ -127,15 +127,18 @@ enum MatchSchemaV1: VersionedSchema {
         }
 
         /// Scores a Point and saves it; the winning Point makes the Match Decided. A Decided Match
-        /// takes no Points, including one Ended early, whose score never shows it Decided.
-        func scorePoint(for team: Team, at timestamp: Date = .now) {
-            guard state == .inProgress else { return }
+        /// takes no Points, including one Ended early, whose score never shows it Decided. Returns the
+        /// haptics the Point fires, none when it was not scored.
+        @discardableResult
+        func scorePoint(for team: Team, at timestamp: Date = .now) -> [Haptic] {
+            guard state == .inProgress else { return [] }
             var match = match
-            match.scorePoint(for: team, at: timestamp)
-            guard match.points.count != points.count else { return }
+            let haptics = match.scorePoint(for: team, at: timestamp)
+            guard match.points.count != points.count else { return [] }
             points = match.points
             if match.score.isDecided { decide(at: timestamp) }
             save()
+            return haptics
         }
 
         /// Removes the most recent Point and saves, reopening a Decided Match; returns the toast naming

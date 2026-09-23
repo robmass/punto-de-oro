@@ -64,6 +64,11 @@ final class MatchRecordTests {
         #expect(score.points(.them) == "15")
     }
 
+    @Test func eachPointScoredFiresItsHaptics() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        #expect(record.scorePoint(for: .them) == [.click, .click])
+    }
+
     @Test func undoIsSaved() throws {
         let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
         for team: Team in [.us, .them, .us] { record.scorePoint(for: team) }
@@ -98,7 +103,7 @@ final class MatchRecordTests {
         for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
         let decidedAt = record.decidedAt
 
-        record.scorePoint(for: .them)
+        #expect(record.scorePoint(for: .them).isEmpty)
 
         #expect(record.match.points.count == 36)
         #expect(record.decidedAt == decidedAt)
@@ -180,7 +185,7 @@ final class MatchRecordTests {
         record.scorePoint(for: .us)
         record.endAndSave()
 
-        record.scorePoint(for: .them)
+        #expect(record.scorePoint(for: .them).isEmpty)
 
         #expect(record.match.points.map(\.winner) == [.us])
         #expect(record.state == .decided)

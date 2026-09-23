@@ -35,6 +35,7 @@ struct LiveScoringView: View {
         HStack {
             Button {
                 toast = record.undo()
+                if toast != nil { Haptic.play([.directionDown]) }
             } label: {
                 Image(systemName: "arrow.uturn.backward")
                     .font(.system(size: 15, weight: .semibold))
@@ -75,14 +76,14 @@ struct LiveScoringView: View {
         .frame(height: height)
         .background(team.halfBackground, ignoresSafeAreaEdges: [])
         .contentShape(Rectangle())
-        .onTapGesture { record.scorePoint(for: team) }
+        .onTapGesture { Haptic.play(record.scorePoint(for: team)) }
     }
 
-    /// The dead band: no gesture, so a tap here does nothing. Completed Sets read left to right,
-    /// then the Games of the Set being played; an Infinite match has only its running Game count,
-    /// and a Super tie-break replacing the third Set has no Games to show. At a Deciding point the
-    /// whole strip turns gold, the one place the app spends it, and everything on it goes black to
-    /// stay legible.
+    /// The dead band: no gesture, so a tap here does nothing and fires no haptic. Completed Sets read
+    /// left to right, then the Games of the Set being played; an Infinite match has only its running
+    /// Game count, and a Super tie-break replacing the third Set has no Games to show. At a Deciding
+    /// point the whole strip turns gold, the one place the app spends it, and everything on it goes
+    /// black to stay legible.
     private func strip(_ match: Match, score: Score) -> some View {
         let isDecidingPoint = score.isDecidingPoint
         return HStack(spacing: 10) {
