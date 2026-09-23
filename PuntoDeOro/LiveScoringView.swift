@@ -1,13 +1,11 @@
+import SwiftData
 import SwiftUI
 
-/// The "Halves" live scoring screen: tap a half to score a Point for that Team.
+/// The "Halves" live scoring screen: tap a half to score a Point for that Team. Every Point and
+/// Undo goes through the record, which saves it.
 struct LiveScoringView: View {
-    @State private var match: Match
+    let record: MatchRecord
     @State private var toast: String?
-
-    init(match: Match = Match()) {
-        _match = State(initialValue: match)
-    }
 
     /// Pinned on every watch; the halves split the remainder. The top bar is tall enough to
     /// hold the system clock, which sits lowest (bottom at 33.5pt) on the 49mm Ultra.
@@ -17,11 +15,12 @@ struct LiveScoringView: View {
     var body: some View {
         GeometryReader { geometry in
             let halfHeight = (geometry.size.height - Self.topBarHeight - Self.stripHeight) / 2
+            let match = record.match
             let score = match.score
             VStack(spacing: 0) {
                 topBar
                 half(.them, score: score, height: halfHeight)
-                strip(score)
+                strip(score, rules: match.rules)
                 half(.us, score: score, height: halfHeight)
             }
         }
@@ -32,7 +31,7 @@ struct LiveScoringView: View {
     private var topBar: some View {
         HStack {
             Button {
-                toast = match.undo()
+                toast = record.undo()
             } label: {
                 Image(systemName: "arrow.uturn.backward")
                     .font(.system(size: 15, weight: .semibold))
@@ -72,7 +71,7 @@ struct LiveScoringView: View {
         .frame(height: height)
         .background(team.halfBackground, ignoresSafeAreaEdges: [])
         .contentShape(Rectangle())
-        .onTapGesture { match.scorePoint(for: team) }
+        .onTapGesture { record.scorePoint(for: team) }
     }
 
     /// The dead band: no gesture, so a tap here does nothing. Completed Sets read left to right,
@@ -80,7 +79,7 @@ struct LiveScoringView: View {
     /// and a Super tie-break replacing the third Set has no Games to show. At a Deciding point the
     /// whole strip turns gold, the one place the app spends it, and everything on it goes black to
     /// stay legible.
-    private func strip(_ score: Score) -> some View {
+    private func strip(_ score: Score, rules: Rules) -> some View {
         let isDecidingPoint = score.isDecidingPoint
         return HStack(spacing: 10) {
             ForEach(score.sets.indices, id: \.self) { index in
@@ -90,7 +89,7 @@ struct LiveScoringView: View {
             if !score.isDecided && !score.isThirdSetSuperTieBreak {
                 gamesColumn(score.games, isDecidingPoint: isDecidingPoint)
             }
-            let statuses = statusLabels(score)
+            let statuses = statusLabels(score, rules: rules)
             if !statuses.isEmpty {
                 VStack(spacing: 0) {
                     ForEach(statuses, id: \.self) { status in
@@ -120,9 +119,9 @@ struct LiveScoringView: View {
     /// `TIE-BREAK` or `SUPER TIE-BREAK` while one is played, stacked over `CHANGE ENDS` until the
     /// next Point. Once the Match is Decided, a placeholder names the winner until the summary
     /// screen lands.
-    private func statusLabels(_ score: Score) -> [String] {
+    private func statusLabels(_ score: Score, rules: Rules) -> [String] {
         if let winner = score.winner { return ["\(winner.name.uppercased()) WIN"] }
-        if score.isDecidingPoint { return [match.rules.deuceRule.name.uppercased()] }
+        if score.isDecidingPoint { return [rules.deuceRule.name.uppercased()] }
         var labels: [String] = []
         switch score.tieBreak {
         case .tieBreak: labels.append("TIE-BREAK")
@@ -175,32 +174,37 @@ private extension Team {
     }
 }
 
+/// Kept alive for the previews' records, and in memory so previews save nothing to disk.
+@MainActor private let previewContainer = try! ModelContainer.matches(ModelConfiguration(isStoredInMemoryOnly: true))
+
+@MainActor
+private func previewRecord(_ rules: Rules = Rules(), pointsWonBy winners: [Team] = []) -> MatchRecord {
+    let record = MatchRecord.start(rules, in: previewContainer.mainContext)
+    for team in winners { record.scorePoint(for: team) }
+    return record
+}
+
 #Preview("3 sets") {
-    LiveScoringView()
+    LiveScoringView(record: previewRecord())
 }
 
 #Preview("Golden point") {
-    var match = Match(rules: Rules(deuceRule: .goldenPoint))
-    for team: Team in [.us, .us, .us, .them, .them, .them] { match.scorePoint(for: team) }
-    return LiveScoringView(match: match)
+    LiveScoringView(record: previewRecord(Rules(deuceRule: .goldenPoint), pointsWonBy: [.us, .us, .us, .them, .them, .them]))
 }
 
 #Preview("Super tie-break") {
     let oneSetAll = [Team](repeating: .us, count: 24) + [Team](repeating: .them, count: 24)
-    var match = Match(rules: Rules(format: .twoSetsPlusSuperTieBreak))
-    for team in oneSetAll + [.us, .them, .us] { match.scorePoint(for: team) }
-    return LiveScoringView(match: match)
+    LiveScoringView(record: previewRecord(Rules(format: .twoSetsPlusSuperTieBreak), pointsWonBy: oneSetAll + [.us, .them, .us]))
 }
 
 #Preview("Infinite") {
-    var match = Match(rules: Rules(format: .infinite))
-    for team in [Team](repeating: .them, count: 44) + [.us, .us] { match.scorePoint(for: team) }
-    return LiveScoringView(match: match)
+    LiveScoringView(record: previewRecord(Rules(format: .infinite), pointsWonBy: [Team](repeating: .them, count: 44) + [.us, .us]))
 }
 
 #Preview("Change ends in a super tie-break") {
     let oneSetAll = [Team](repeating: .us, count: 24) + [Team](repeating: .them, count: 24)
-    var match = Match(rules: Rules(format: .twoSetsPlusSuperTieBreak))
-    for team in oneSetAll + [.us, .them, .us, .them, .us, .them] { match.scorePoint(for: team) }
-    return LiveScoringView(match: match)
+    LiveScoringView(record: previewRecord(
+        Rules(format: .twoSetsPlusSuperTieBreak),
+        pointsWonBy: oneSetAll + [.us, .them, .us, .them, .us, .them]
+    ))
 }

@@ -11,9 +11,12 @@
 		4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B751D83F59BF072BE01CE1C /* Match.swift */; };
 		5CFFFEEBEED0E7E617C96222 /* PointLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178B522F26D5CC99191F89E3 /* PointLogs.swift */; };
 		A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */; };
+		B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */; };
 		CF4EF9FAC0FCA63DD0B22A3C /* DeuceRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */; };
+		DAA095EDABC75F93CEF6B2CB /* MatchRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B3153C9F371680C540518C /* MatchRecord.swift */; };
 		EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0820ACD0049B3EF42241B96D /* LiveScoringView.swift */; };
 		F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */; };
+		F7C8AD2848B497CB5C7CAF3B /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F453426AF151D2F08C069BBA /* RootView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,11 +34,14 @@
 		1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBundleTests.swift; sourceTree = "<group>"; };
 		178B522F26D5CC99191F89E3 /* PointLogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointLogs.swift; sourceTree = "<group>"; };
 		272BC41A9E13527403A0F030 /* PuntoDeOro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PuntoDeOro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		29B3153C9F371680C540518C /* MatchRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecord.swift; sourceTree = "<group>"; };
+		2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecordTests.swift; sourceTree = "<group>"; };
 		8B751D83F59BF072BE01CE1C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
 		C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuntoDeOroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeuceRuleTests.swift; sourceTree = "<group>"; };
 		E9427B1814EC8BE2BF988ACE /* MatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchTests.swift; sourceTree = "<group>"; };
+		F453426AF151D2F08C069BBA /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -53,6 +59,7 @@
 			children = (
 				1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */,
 				D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */,
+				2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */,
 				E9427B1814EC8BE2BF988ACE /* MatchTests.swift */,
 				178B522F26D5CC99191F89E3 /* PointLogs.swift */,
 			);
@@ -64,7 +71,9 @@
 			children = (
 				0820ACD0049B3EF42241B96D /* LiveScoringView.swift */,
 				8B751D83F59BF072BE01CE1C /* Match.swift */,
+				29B3153C9F371680C540518C /* MatchRecord.swift */,
 				B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */,
+				F453426AF151D2F08C069BBA /* RootView.swift */,
 			);
 			path = PuntoDeOro;
 			sourceTree = "<group>";
@@ -162,6 +171,7 @@
 			files = (
 				F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */,
 				CF4EF9FAC0FCA63DD0B22A3C /* DeuceRuleTests.swift in Sources */,
+				B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */,
 				33EF3132361FC686046AF61F /* MatchTests.swift in Sources */,
 				5CFFFEEBEED0E7E617C96222 /* PointLogs.swift in Sources */,
 			);
@@ -173,7 +183,9 @@
 			files = (
 				EDFFA46A3471F7B0D01ADC23 /* LiveScoringView.swift in Sources */,
 				4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */,
+				DAA095EDABC75F93CEF6B2CB /* MatchRecord.swift in Sources */,
 				A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */,
+				F7C8AD2848B497CB5C7CAF3B /* RootView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

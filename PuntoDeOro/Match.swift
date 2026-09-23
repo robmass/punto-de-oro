@@ -1,7 +1,7 @@
 import Foundation
 
 /// One of the two sides in a Match. The wearer's Team is always Us.
-enum Team {
+enum Team: String, Codable {
     case us, them
 
     var name: String { self == .us ? "Us" : "Them" }
@@ -10,20 +10,20 @@ enum Team {
 }
 
 /// One rally, won by exactly one Team.
-struct Point {
+struct Point: Codable {
     let winner: Team
     let timestamp: Date
 }
 
 /// The fixed configuration of a Match.
-struct Rules {
+struct Rules: Equatable {
     var format: Format = .threeSets
     var deuceRule: DeuceRule = .advantage
     var firstServer: Team = .us
 }
 
 /// How a Game is settled from Deuce.
-enum DeuceRule {
+enum DeuceRule: String {
     case advantage, goldenPoint, silverPoint, starPoint
 
     var name: String {
@@ -90,7 +90,7 @@ enum Format: Equatable {
 }
 
 /// The Game that decides a level Set.
-enum TieBreak {
+enum TieBreak: String {
     case tieBreak, superTieBreak
 
     fileprivate var pointsToWin: Int { self == .tieBreak ? 7 : 10 }
@@ -101,8 +101,9 @@ struct Match {
     let rules: Rules
     private(set) var points: [Point] = []
 
-    init(rules: Rules = Rules()) {
+    init(rules: Rules = Rules(), points: [Point] = []) {
         self.rules = rules
+        self.points = points
     }
 
     /// Once the Match is Decided, only Undo changes the Point log.
