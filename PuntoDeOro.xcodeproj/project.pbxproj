@@ -11,6 +11,9 @@
 		1243DEA518E18782B6819F53 /* LiveGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF82EC252A2329CD731AE82 /* LiveGeometryTests.swift */; };
 		183042A81162D036E527E115 /* SetupWizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */; };
 		33EF3132361FC686046AF61F /* MatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9427B1814EC8BE2BF988ACE /* MatchTests.swift */; };
+		3A779DDED68FD441BA0E9639 /* PuntoDeOroLauncherBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0920C4C58109879268D652E8 /* PuntoDeOroLauncherBundle.swift */; };
+		3B2C98678BC76D19CF228E84 /* LauncherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C97310DF8415E497CE78C0 /* LauncherTests.swift */; };
+		3EC8C7CFB1F0C29BA9C5A4A9 /* CourtGlyphTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF29E94C77E5A4053238E7A8 /* CourtGlyphTests.swift */; };
 		484A6753801FBF1861DE2F82 /* HapticTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABAC452C10C835680F7BB26 /* HapticTests.swift */; };
 		4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B751D83F59BF072BE01CE1C /* Match.swift */; };
 		56DB16DCC70B84648F277348 /* MatchWorkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA448ADE8DB0F912B621BCE /* MatchWorkout.swift */; };
@@ -18,13 +21,19 @@
 		5CFFFEEBEED0E7E617C96222 /* PointLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178B522F26D5CC99191F89E3 /* PointLogs.swift */; };
 		5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */; };
 		5E59838A737863895315F5BF /* MatchSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954A3B517897631856E3D0D5 /* MatchSummary.swift */; };
+		5FC3158094E8224EEFF53B97 /* CourtGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE9ED325A3586775B7708E3 /* CourtGlyph.swift */; };
+		6BEBE052B4F9CC8295BEC730 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 651FC5B85879FD7AAB3F0C69 /* Assets.xcassets */; };
+		782DB8A39FE3EE7CE267566F /* Launcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */; };
 		79663A44A10B711A615A98CC /* Haptic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C16C48744614A3D9385ACC /* Haptic.swift */; };
+		84641D7C6EFE95F974748C06 /* Launcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */; };
 		92EFF2EF0F6DC0B9E208C64F /* LiveStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B1F9EDE5C2E27EF470DA90 /* LiveStyleTests.swift */; };
 		981E7654B18E4E5FB7825A5E /* SetupWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */; };
 		9F0FC5FD0245C328CA312090 /* SummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB652EC33ADEB4450F3181E /* SummaryView.swift */; };
 		A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */; };
 		A3C0927ABA94EFED8EA74B18 /* LiveStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */; };
 		B2226431BADA19B30AD6BFC3 /* MatchRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */; };
+		C514BAAB94A5937A3FE33C1B /* CourtGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE9ED325A3586775B7708E3 /* CourtGlyph.swift */; };
+		C8248CD2734C3FF24CFBE46F /* PuntoDeOroLauncher.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 79A38E53DB506762998AE334 /* PuntoDeOroLauncher.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CDB8BFB57F6239E21EA7B892 /* LiveGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9984A001923811A141927DD1 /* LiveGeometry.swift */; };
 		CF4EF9FAC0FCA63DD0B22A3C /* DeuceRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */; };
 		DAA095EDABC75F93CEF6B2CB /* MatchRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B3153C9F371680C540518C /* MatchRecord.swift */; };
@@ -37,6 +46,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1CB4C83A28747932F1285818 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BCBE297E7131BFA010443F0E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7EDDE2CA99BA282C8BBFE809;
+			remoteInfo = PuntoDeOroLauncher;
+		};
 		CFAC5EEFCF34F3B5D5A227BF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BCBE297E7131BFA010443F0E /* Project object */;
@@ -46,12 +62,30 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		73079AED5EF63049FB4FBAB8 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C8248CD2734C3FF24CFBE46F /* PuntoDeOroLauncher.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		00B1F9EDE5C2E27EF470DA90 /* LiveStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveStyleTests.swift; sourceTree = "<group>"; };
+		00C97310DF8415E497CE78C0 /* LauncherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherTests.swift; sourceTree = "<group>"; };
 		0820ACD0049B3EF42241B96D /* LiveScoringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScoringView.swift; sourceTree = "<group>"; };
+		0920C4C58109879268D652E8 /* PuntoDeOroLauncherBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroLauncherBundle.swift; sourceTree = "<group>"; };
 		0AA448ADE8DB0F912B621BCE /* MatchWorkout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchWorkout.swift; sourceTree = "<group>"; };
 		1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBundleTests.swift; sourceTree = "<group>"; };
 		178B522F26D5CC99191F89E3 /* PointLogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointLogs.swift; sourceTree = "<group>"; };
+		1DE9ED325A3586775B7708E3 /* CourtGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourtGlyph.swift; sourceTree = "<group>"; };
+		23307FAD11BB2CFF576A6B59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		272BC41A9E13527403A0F030 /* PuntoDeOro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PuntoDeOro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		29B3153C9F371680C540518C /* MatchRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecord.swift; sourceTree = "<group>"; };
 		2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecordTests.swift; sourceTree = "<group>"; };
@@ -60,8 +94,10 @@
 		4F54E54B7E627C6F1DBF5179 /* LiveAccessibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAccessibility.swift; sourceTree = "<group>"; };
 		54B34272D6118415BF6BE618 /* MatchSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSummaryTests.swift; sourceTree = "<group>"; };
 		5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPagesView.swift; sourceTree = "<group>"; };
+		651FC5B85879FD7AAB3F0C69 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardView.swift; sourceTree = "<group>"; };
 		735DF2A71E58FA68159D0673 /* LiveAccessibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAccessibilityTests.swift; sourceTree = "<group>"; };
+		79A38E53DB506762998AE334 /* PuntoDeOroLauncher.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PuntoDeOroLauncher.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FB652EC33ADEB4450F3181E /* SummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryView.swift; sourceTree = "<group>"; };
 		861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardTests.swift; sourceTree = "<group>"; };
 		8B751D83F59BF072BE01CE1C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
@@ -69,8 +105,10 @@
 		96177AC9FC687A49A1A2390A /* PuntoDeOro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PuntoDeOro.entitlements; sourceTree = "<group>"; };
 		9984A001923811A141927DD1 /* LiveGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGeometry.swift; sourceTree = "<group>"; };
 		A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AF29E94C77E5A4053238E7A8 /* CourtGlyphTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourtGlyphTests.swift; sourceTree = "<group>"; };
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
 		BCF82EC252A2329CD731AE82 /* LiveGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGeometryTests.swift; sourceTree = "<group>"; };
+		C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher.swift; sourceTree = "<group>"; };
 		C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuntoDeOroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2D3CBEFB57EC3693D17D938 /* LiveStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveStyle.swift; sourceTree = "<group>"; };
 		D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeuceRuleTests.swift; sourceTree = "<group>"; };
@@ -85,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				272BC41A9E13527403A0F030 /* PuntoDeOro.app */,
+				79A38E53DB506762998AE334 /* PuntoDeOroLauncher.appex */,
 				C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */,
 			);
 			name = Products;
@@ -94,8 +133,10 @@
 			isa = PBXGroup;
 			children = (
 				1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */,
+				AF29E94C77E5A4053238E7A8 /* CourtGlyphTests.swift */,
 				D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */,
 				FABAC452C10C835680F7BB26 /* HapticTests.swift */,
+				00C97310DF8415E497CE78C0 /* LauncherTests.swift */,
 				735DF2A71E58FA68159D0673 /* LiveAccessibilityTests.swift */,
 				BCF82EC252A2329CD731AE82 /* LiveGeometryTests.swift */,
 				00B1F9EDE5C2E27EF470DA90 /* LiveStyleTests.swift */,
@@ -108,10 +149,22 @@
 			path = PuntoDeOroTests;
 			sourceTree = "<group>";
 		};
+		191453AE6AB8D39FC02B1D85 /* PuntoDeOroLauncher */ = {
+			isa = PBXGroup;
+			children = (
+				1DE9ED325A3586775B7708E3 /* CourtGlyph.swift */,
+				23307FAD11BB2CFF576A6B59 /* Info.plist */,
+				C00CEEFD3C59806FA48A8BF2 /* Launcher.swift */,
+				0920C4C58109879268D652E8 /* PuntoDeOroLauncherBundle.swift */,
+			);
+			path = PuntoDeOroLauncher;
+			sourceTree = "<group>";
+		};
 		CA1F31394513A753031BBA21 /* PuntoDeOro */ = {
 			isa = PBXGroup;
 			children = (
 				A5EF28003E9825DC0B50AD99 /* AppDelegate.swift */,
+				651FC5B85879FD7AAB3F0C69 /* Assets.xcassets */,
 				39C16C48744614A3D9385ACC /* Haptic.swift */,
 				35FF2E5F1FFC20012592FC29 /* Info.plist */,
 				4F54E54B7E627C6F1DBF5179 /* LiveAccessibility.swift */,
@@ -137,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				CA1F31394513A753031BBA21 /* PuntoDeOro */,
+				191453AE6AB8D39FC02B1D85 /* PuntoDeOroLauncher */,
 				0CBB8E1C0BF8073691F8801B /* PuntoDeOroTests */,
 				095B3781861371EA3C63D13C /* Products */,
 			);
@@ -150,10 +204,13 @@
 			buildConfigurationList = D06A3A3BBCD495EF52ECF808 /* Build configuration list for PBXNativeTarget "PuntoDeOro" */;
 			buildPhases = (
 				CEDDD342F2173A94A0BF65E3 /* Sources */,
+				51ED6DAC619200C3CD2E9E04 /* Resources */,
+				73079AED5EF63049FB4FBAB8 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B33A6059DABE4D1CFAAC11A7 /* PBXTargetDependency */,
 			);
 			name = PuntoDeOro;
 			packageProductDependencies = (
@@ -180,6 +237,23 @@
 			productReference = C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		7EDDE2CA99BA282C8BBFE809 /* PuntoDeOroLauncher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 30D7F1B3702EA449445DB9F7 /* Build configuration list for PBXNativeTarget "PuntoDeOroLauncher" */;
+			buildPhases = (
+				FCCD98FD966E7860D419E5F1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PuntoDeOroLauncher;
+			packageProductDependencies = (
+			);
+			productName = PuntoDeOroLauncher;
+			productReference = 79A38E53DB506762998AE334 /* PuntoDeOroLauncher.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -194,6 +268,10 @@
 						ProvisioningStyle = Automatic;
 					};
 					12487AAE266BE511E173F050 = {
+						DevelopmentTeam = PYTG8F6332;
+						ProvisioningStyle = Automatic;
+					};
+					7EDDE2CA99BA282C8BBFE809 = {
 						DevelopmentTeam = PYTG8F6332;
 						ProvisioningStyle = Automatic;
 					};
@@ -214,10 +292,22 @@
 			projectRoot = "";
 			targets = (
 				113E18CAC56EB5F2D082DBE1 /* PuntoDeOro */,
+				7EDDE2CA99BA282C8BBFE809 /* PuntoDeOroLauncher */,
 				12487AAE266BE511E173F050 /* PuntoDeOroTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		51ED6DAC619200C3CD2E9E04 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6BEBE052B4F9CC8295BEC730 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		045F53EF27C96C03BB91CA46 /* Sources */ = {
@@ -225,8 +315,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				F3B346A30DD98132AC97EDB8 /* AppBundleTests.swift in Sources */,
+				C514BAAB94A5937A3FE33C1B /* CourtGlyph.swift in Sources */,
+				3EC8C7CFB1F0C29BA9C5A4A9 /* CourtGlyphTests.swift in Sources */,
 				CF4EF9FAC0FCA63DD0B22A3C /* DeuceRuleTests.swift in Sources */,
 				484A6753801FBF1861DE2F82 /* HapticTests.swift in Sources */,
+				84641D7C6EFE95F974748C06 /* Launcher.swift in Sources */,
+				3B2C98678BC76D19CF228E84 /* LauncherTests.swift in Sources */,
 				5C6D9393B3D2AF03E387D2D6 /* LiveAccessibilityTests.swift in Sources */,
 				1243DEA518E18782B6819F53 /* LiveGeometryTests.swift in Sources */,
 				92EFF2EF0F6DC0B9E208C64F /* LiveStyleTests.swift in Sources */,
@@ -261,6 +355,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FCCD98FD966E7860D419E5F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5FC3158094E8224EEFF53B97 /* CourtGlyph.swift in Sources */,
+				782DB8A39FE3EE7CE267566F /* Launcher.swift in Sources */,
+				3A779DDED68FD441BA0E9639 /* PuntoDeOroLauncherBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -269,9 +373,30 @@
 			target = 113E18CAC56EB5F2D082DBE1 /* PuntoDeOro */;
 			targetProxy = CFAC5EEFCF34F3B5D5A227BF /* PBXContainerItemProxy */;
 		};
+		B33A6059DABE4D1CFAAC11A7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7EDDE2CA99BA282C8BBFE809 /* PuntoDeOroLauncher */;
+			targetProxy = 1CB4C83A28747932F1285818 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		6245D3E77E72F407E82C1BAF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = PuntoDeOroLauncher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.robmass.PuntoDeOro.Launcher;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
 		6B0BE18E6E28CC0E0A28E528 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -387,6 +512,22 @@
 			};
 			name = Release;
 		};
+		8B1BE3EC8AC17971262220C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = PuntoDeOroLauncher/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.robmass.PuntoDeOro.Launcher;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
 		93C54D2D633D2146D856C16A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -476,6 +617,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		30D7F1B3702EA449445DB9F7 /* Build configuration list for PBXNativeTarget "PuntoDeOroLauncher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B1BE3EC8AC17971262220C3 /* Debug */,
+				6245D3E77E72F407E82C1BAF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		5E88E9327DAAD2A3F1415D58 /* Build configuration list for PBXNativeTarget "PuntoDeOroTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
