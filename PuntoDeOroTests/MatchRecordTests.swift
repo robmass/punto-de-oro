@@ -120,6 +120,19 @@ final class MatchRecordTests {
         #expect(relaunched.rules.deuceRule == .starPoint)
     }
 
+    @Test func theLastRulesAreTheMostRecentRecordsFinishedOrNot() throws {
+        let context = try relaunch()
+        #expect(try context.fetch(MatchRecord.latestDescriptor).isEmpty)
+
+        MatchRecord.start(Rules(deuceRule: .goldenPoint), at: Date(timeIntervalSinceReferenceDate: 1), in: context)
+            .finish()
+        let latest = Rules(format: .infinite, deuceRule: .silverPoint, firstServer: .them)
+        MatchRecord.start(latest, at: Date(timeIntervalSinceReferenceDate: 2), in: context).finish()
+
+        let relaunched = try relaunch().fetch(MatchRecord.latestDescriptor)
+        #expect(relaunched.map(\.rules) == [latest])
+    }
+
     @Test func aFinishedMatchIsFinal() throws {
         let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
         for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }

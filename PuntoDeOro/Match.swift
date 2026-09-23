@@ -1,7 +1,7 @@
 import Foundation
 
 /// One of the two sides in a Match. The wearer's Team is always Us.
-enum Team: String, Codable {
+enum Team: String, Codable, CaseIterable {
     case us, them
 
     var name: String { self == .us ? "Us" : "Them" }
@@ -23,7 +23,7 @@ struct Rules: Equatable {
 }
 
 /// How a Game is settled from Deuce.
-enum DeuceRule: String {
+enum DeuceRule: String, CaseIterable {
     case advantage, goldenPoint, silverPoint, starPoint
 
     var name: String {
@@ -74,10 +74,13 @@ enum Format: Equatable {
         }
     }
 
-    /// The tie-break that decides a level Set.
-    fileprivate var setTieBreak: TieBreak {
-        if case .proSet(let decider) = self { decider } else { .tieBreak }
+    /// What decides a Pro set at 8–8, or nil for every other Format.
+    var proSetDecider: TieBreak? {
+        if case .proSet(let decider) = self { decider } else { nil }
     }
+
+    /// The tie-break that decides a level Set.
+    fileprivate var setTieBreak: TieBreak { proSetDecider ?? .tieBreak }
 
     /// The Sets that win the Match, or nil when the Format has no Sets.
     fileprivate var setsToWin: Int? {
@@ -90,7 +93,7 @@ enum Format: Equatable {
 }
 
 /// The Game that decides a level Set.
-enum TieBreak: String {
+enum TieBreak: String, CaseIterable {
     case tieBreak, superTieBreak
 
     fileprivate var pointsToWin: Int { self == .tieBreak ? 7 : 10 }

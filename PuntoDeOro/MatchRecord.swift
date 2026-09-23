@@ -81,6 +81,14 @@ enum MatchSchemaV1: VersionedSchema {
             return try context.fetch(descriptor).first
         }
 
+        /// The most recent record, Finished or not: the source of the last Rules, so they need no
+        /// separate store.
+        static var latestDescriptor: FetchDescriptor<MatchRecord> {
+            var descriptor = FetchDescriptor<MatchRecord>(sortBy: [SortDescriptor(\.startDate, order: .reverse)])
+            descriptor.fetchLimit = 1
+            return descriptor
+        }
+
         /// Scores a Point and saves it; the winning Point makes the Match Decided.
         func scorePoint(for team: Team, at timestamp: Date = .now) {
             guard state != .finished else { return }
