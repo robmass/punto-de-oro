@@ -12,15 +12,16 @@ struct LiveScoringView: View {
     /// Always On. Only the paint changes while dimmed: every frame and tap area stays as it is, so a
     /// tap with the wrist down lands where it did with the wrist up.
     @Environment(\.isLuminanceReduced) private var isDimmed
-
-    /// Pinned on every watch; the halves split the remainder. The top bar is tall enough to
-    /// hold the system clock, which sits lowest (bottom at 33.5pt) on the 49mm Ultra.
-    private static let topBarHeight: CGFloat = 36
-    private static let stripHeight: CGFloat = 34
+    /// The US / THEM labels and the strip's chips follow Dynamic Type, capped so a label cannot reach
+    /// its score and two stacked chips still fit the strip. Everything else on the screen is pinned
+    /// to the geometry: the score is already as large as its half allows.
+    @ScaledMetric(relativeTo: .caption2) private var teamLabelSize = LiveGeometry.teamLabelSize
+    @ScaledMetric(relativeTo: .caption2) private var chipSize: CGFloat = 11
+    private static let maxChipSize: CGFloat = 13
 
     var body: some View {
         GeometryReader { geometry in
-            let halfHeight = (geometry.size.height - Self.topBarHeight - Self.stripHeight) / 2
+            let halfHeight = (geometry.size.height - LiveGeometry.topBarHeight - LiveGeometry.stripHeight) / 2
             let match = record.match
             let score = match.score
             VStack(spacing: 0) {
@@ -44,31 +45,37 @@ struct LiveScoringView: View {
             } label: {
                 Image(systemName: "arrow.uturn.backward")
                     .font(.system(size: 15, weight: .semibold))
-                    .frame(width: 60, height: Self.topBarHeight)
+                    .frame(width: 60, height: LiveGeometry.topBarHeight)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .handGestureShortcut(.primaryAction, isEnabled: isPrimaryActionEnabled)
-            .accessibilityLabel("Undo")
+            .accessibilityLabel("Undo last point")
             Spacer()
         }
-        .frame(height: Self.topBarHeight)
+        .frame(height: LiveGeometry.topBarHeight)
         .background(.black, ignoresSafeAreaEdges: [])
     }
 
+    /// The score alone is laid out, centred in the half; the Team label is overlaid at the half's
+    /// outer edge, away from the strip, so however far it scales it cannot move the score. One
+    /// accessibility element, read as its Team and Point score; VoiceOver's double-tap scores.
     private func half(_ team: Team, score: Score, height: CGFloat) -> some View {
-        let label = Text(team.name.uppercased())
-            .font(.system(size: 12, weight: .semibold))
-            .opacity(0.85)
-        return VStack(spacing: 0) {
-            if team == .them { label }
-            Text(score.points(team))
-                .font(.system(size: height * 0.7, weight: .bold).monospacedDigit())
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-            if team == .us { label }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        let spoken = score.spokenHalf(team)
+        return Text(score.points(team))
+            .font(.system(size: LiveGeometry.scoreSize(halfHeight: height), weight: .bold).monospacedDigit())
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: team == .them ? .top : .bottom) {
+                Text(team.name.uppercased())
+                    .font(.system(
+                        size: min(teamLabelSize, LiveGeometry.maxTeamLabelSize(halfHeight: height)),
+                        weight: .semibold
+                    ))
+                    .opacity(0.85)
+                    .padding(team == .them ? .top : .bottom, LiveGeometry.teamLabelInset)
+            }
         .overlay(alignment: .leading) {
             if score.servingTeam == team {
                 Circle()
@@ -80,40 +87,56 @@ struct LiveScoringView: View {
         .frame(height: height)
         .paint(LiveStyle.half(team, isDimmed: isDimmed))
         .contentShape(Rectangle())
-        .onTapGesture { Haptic.play(record.scorePoint(for: team)) }
+        .onTapGesture { scorePoint(for: team) }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(spoken.label)
+        .accessibilityValue(spoken.value)
+        .accessibilityHint(spoken.hint)
+        .accessibilityAction { scorePoint(for: team) }
+    }
+
+    private func scorePoint(for team: Team) {
+        Haptic.play(record.scorePoint(for: team))
     }
 
     /// The dead band: no gesture, so a tap here does nothing and fires no haptic. Completed Sets read
     /// left to right, then the Games of the Set being played; an Infinite match has only its running
     /// Game count, and a Super tie-break replacing the third Set has no Games to show. At a Deciding
     /// point the whole strip turns gold, the one place the app spends it, and everything on it goes
-    /// black to stay legible; dimmed, it is a gold outline with everything on it gold.
+    /// black to stay legible; dimmed, it is a gold outline with everything on it gold. VoiceOver reads
+    /// it as one element carrying the whole state.
     private func strip(_ match: Match, score: Score) -> some View {
         let isDecidingPoint = score.isDecidingPoint
         return HStack(spacing: 10) {
             ForEach(score.sets.indices, id: \.self) { index in
                 gamesColumn(score.sets[index].games, isDecidingPoint: isDecidingPoint)
                     .opacity(0.6)
+                    .layoutPriority(1)
             }
             if !score.isDecided && !score.isThirdSetSuperTieBreak {
                 gamesColumn(score.games, isDecidingPoint: isDecidingPoint)
+                    .layoutPriority(1)
             }
-            let statuses = statusLabels(match, score: score)
+            let statuses = match.stripStatuses
             if !statuses.isEmpty {
                 VStack(spacing: 0) {
                     ForEach(statuses, id: \.self) { status in
-                        Text(status)
+                        Text(status.uppercased())
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                     }
                 }
-                .font(.system(size: 11, weight: .bold))
+                .font(.system(size: min(chipSize, Self.maxChipSize), weight: .bold))
             }
         }
         .font(.system(size: 15, weight: .semibold).monospacedDigit())
+        // The Games never give way: a chip too wide at its size shrinks instead, clear of the edges.
+        .padding(.horizontal, 6)
         .frame(maxWidth: .infinity)
-        .frame(height: Self.stripHeight)
+        .frame(height: LiveGeometry.stripHeight)
         .paint(LiveStyle.strip(isDecidingPoint: isDecidingPoint, isDimmed: isDimmed))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(match.spokenStrip)
     }
 
     private func gamesColumn(_ games: (Team) -> Int, isDecidingPoint: Bool) -> some View {
@@ -123,21 +146,6 @@ struct LiveScoringView: View {
             Text("\(games(.us))")
                 .foregroundStyle(LiveStyle.games(.us, isDecidingPoint: isDecidingPoint, isDimmed: isDimmed))
         }
-    }
-
-    /// The strip's status, one label per line: the Deuce rule's name at a Deciding point, else
-    /// `TIE-BREAK` or `SUPER TIE-BREAK` while one is played, stacked over `CHANGE ENDS` until the
-    /// next Point.
-    private func statusLabels(_ match: Match, score: Score) -> [String] {
-        if score.isDecidingPoint { return [match.rules.deuceRule.name.uppercased()] }
-        var labels: [String] = []
-        switch score.tieBreak {
-        case .tieBreak: labels.append("TIE-BREAK")
-        case .superTieBreak: labels.append("SUPER TIE-BREAK")
-        case nil: break
-        }
-        if score.isChangeOfEnds { labels.append("CHANGE ENDS") }
-        return labels
     }
 
     /// Not while dimmed: its filled capsule would light up the black screen.
