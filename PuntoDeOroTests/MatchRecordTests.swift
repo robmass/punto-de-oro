@@ -10,6 +10,8 @@ final class MatchRecordTests {
         .appending(path: "MatchRecordTests-\(UUID().uuidString).store")
     /// A context does not keep its container alive, so every container opened lives as long as the test.
     private var containers: [ModelContainer] = []
+    /// Stands in for the Health workout every Match runs as.
+    private let workout = WorkoutSpy()
 
     /// The app relaunched: a fresh container on the same store, sharing nothing in memory.
     private func relaunch() throws -> ModelContext {
@@ -22,7 +24,7 @@ final class MatchRecordTests {
         let context = try relaunch()
         #expect(try MatchRecord.current(in: context) == nil)
 
-        MatchRecord.start(Rules(deuceRule: .goldenPoint), in: context)
+        MatchRecord.start(Rules(deuceRule: .goldenPoint), in: context, workout: workout)
 
         let relaunched = try #require(try MatchRecord.current(in: relaunch()))
         #expect(relaunched.state == .inProgress)
@@ -38,14 +40,14 @@ final class MatchRecordTests {
         Rules(format: .infinite, deuceRule: .advantage, firstServer: .them),
     ])
     func theRulesSurviveARelaunch(rules: Rules) throws {
-        MatchRecord.start(rules, in: try relaunch())
+        MatchRecord.start(rules, in: try relaunch(), workout: workout)
 
         let relaunched = try #require(try MatchRecord.current(in: relaunch()))
         #expect(relaunched.rules == rules)
     }
 
     @Test func everyPointIsSavedAsItIsScored() throws {
-        let record = MatchRecord.start(Rules(), in: try relaunch())
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
         let startDate = record.startDate
         let played = Date(timeIntervalSinceReferenceDate: 1_000)
         for (offset, team) in (gamesToLove(.them, 1) + [.us, .us, .them]).enumerated() {
@@ -63,7 +65,7 @@ final class MatchRecordTests {
     }
 
     @Test func undoIsSaved() throws {
-        let record = MatchRecord.start(Rules(), in: try relaunch())
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
         for team: Team in [.us, .them, .us] { record.scorePoint(for: team) }
 
         #expect(record.undo() == "Undone · point Us · 15–15")
@@ -73,7 +75,7 @@ final class MatchRecordTests {
     }
 
     @Test func theWinningPointDecidesTheMatchAndUndoReopensIt() throws {
-        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch(), workout: workout)
         let matchPoint = gamesToLove(.us, 8) + gamesToLove(.them, 3) + [.us, .us, .us]
         for team in matchPoint { record.scorePoint(for: team) }
         let winningPoint = Date(timeIntervalSinceReferenceDate: 2_000)
@@ -92,7 +94,7 @@ final class MatchRecordTests {
     }
 
     @Test func aPointAfterTheMatchIsDecidedIsNotRecorded() throws {
-        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch(), workout: workout)
         for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
         let decidedAt = record.decidedAt
 
@@ -104,9 +106,9 @@ final class MatchRecordTests {
 
     @Test func finishedRecordsAreKeptButNeverCurrent() throws {
         let context = try relaunch()
-        let first = MatchRecord.start(Rules(), in: context)
+        let first = MatchRecord.start(Rules(), in: context, workout: workout)
         first.scorePoint(for: .us)
-        first.finish()
+        first.finish(workout: workout)
 
         #expect(try MatchRecord.current(in: relaunch()) == nil)
         let kept = try relaunch().fetch(FetchDescriptor<MatchRecord>())
@@ -114,7 +116,7 @@ final class MatchRecordTests {
         #expect(kept.first?.state == .finished)
         #expect(kept.first?.match.points.count == 1)
 
-        MatchRecord.start(Rules(deuceRule: .starPoint), in: context)
+        MatchRecord.start(Rules(deuceRule: .starPoint), in: context, workout: workout)
 
         let relaunched = try #require(try MatchRecord.current(in: relaunch()))
         #expect(relaunched.rules.deuceRule == .starPoint)
@@ -124,19 +126,19 @@ final class MatchRecordTests {
         let context = try relaunch()
         #expect(try context.fetch(MatchRecord.latestDescriptor).isEmpty)
 
-        MatchRecord.start(Rules(deuceRule: .goldenPoint), at: Date(timeIntervalSinceReferenceDate: 1), in: context)
-            .finish()
+        MatchRecord.start(Rules(deuceRule: .goldenPoint), at: Date(timeIntervalSinceReferenceDate: 1), in: context, workout: workout)
+            .finish(workout: workout)
         let latest = Rules(format: .infinite, deuceRule: .silverPoint, firstServer: .them)
-        MatchRecord.start(latest, at: Date(timeIntervalSinceReferenceDate: 2), in: context).finish()
+        MatchRecord.start(latest, at: Date(timeIntervalSinceReferenceDate: 2), in: context, workout: workout).finish(workout: workout)
 
         let relaunched = try relaunch().fetch(MatchRecord.latestDescriptor)
         #expect(relaunched.map(\.rules) == [latest])
     }
 
     @Test func aFinishedMatchIsFinal() throws {
-        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch(), workout: workout)
         for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
-        record.finish()
+        record.finish(workout: workout)
 
         #expect(record.undo() == nil)
         record.scorePoint(for: .them)
@@ -148,7 +150,7 @@ final class MatchRecordTests {
     }
 
     @Test func savingAnEndedSetBasedMatchDecidesItUnfinished() throws {
-        let record = MatchRecord.start(Rules(), in: try relaunch())
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
         for team in gamesToLove(.us, 1) + [.them, .them] { record.scorePoint(for: team) }
         #expect(record.endNeedsConfirmation)
         let endedAt = Date(timeIntervalSinceReferenceDate: 3_000)
@@ -163,7 +165,7 @@ final class MatchRecordTests {
     }
 
     @Test func savingAnEndedInfiniteMatchKeepsItsNormalResult() throws {
-        let record = MatchRecord.start(Rules(format: .infinite), in: try relaunch())
+        let record = MatchRecord.start(Rules(format: .infinite), in: try relaunch(), workout: workout)
         for team in gamesToLove(.them, 2) + gamesToLove(.us, 1) + [.us, .us] { record.scorePoint(for: team) }
 
         record.endAndSave()
@@ -174,7 +176,7 @@ final class MatchRecordTests {
     }
 
     @Test func aMatchEndedAndSavedTakesNoMorePoints() throws {
-        let record = MatchRecord.start(Rules(), in: try relaunch())
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
         record.scorePoint(for: .us)
         record.endAndSave()
 
@@ -186,11 +188,11 @@ final class MatchRecordTests {
 
     @Test func abandoningAMatchLeavesNoRecord() throws {
         let context = try relaunch()
-        MatchRecord.start(Rules(), in: context).finish()
-        let record = MatchRecord.start(Rules(deuceRule: .goldenPoint), in: context)
+        MatchRecord.start(Rules(), in: context, workout: workout).finish(workout: workout)
+        let record = MatchRecord.start(Rules(deuceRule: .goldenPoint), in: context, workout: workout)
         record.scorePoint(for: .them)
 
-        record.abandon()
+        record.abandon(workout: workout)
 
         #expect(try MatchRecord.current(in: relaunch()) == nil)
         let kept = try relaunch().fetch(FetchDescriptor<MatchRecord>())
@@ -198,7 +200,7 @@ final class MatchRecordTests {
     }
 
     @Test func anEmptyMatchNeedsNoConfirmationToEnd() throws {
-        let record = MatchRecord.start(Rules(), in: try relaunch())
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
         #expect(!record.endNeedsConfirmation)
         record.scorePoint(for: .us)
         record.undo()
@@ -206,16 +208,111 @@ final class MatchRecordTests {
     }
 
     @Test func aDecidedMatchCanNoLongerBeEnded() throws {
-        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch())
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch(), workout: workout)
         for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
         let decidedAt = record.decidedAt
         #expect(!record.canEnd)
 
         record.endAndSave()
-        record.abandon()
+        record.abandon(workout: workout)
 
         let relaunched = try #require(try MatchRecord.current(in: relaunch()))
         #expect(relaunched.decidedAt == decidedAt)
         #expect(relaunched.match.score.result == .won(.us))
     }
+
+    // MARK: - The workout
+
+    @Test func startingAMatchBeginsItsWorkoutAtTheStart() throws {
+        let startDate = Date(timeIntervalSinceReferenceDate: 500)
+
+        MatchRecord.start(Rules(), at: startDate, in: try relaunch(), workout: workout)
+
+        #expect(workout.calls == [.begin(startDate)])
+    }
+
+    @Test func theWorkoutNeverPausesBeforeTheMatchIsFinished() throws {
+        let startDate = Date(timeIntervalSinceReferenceDate: 500)
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), at: startDate, in: try relaunch(), workout: workout)
+        for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
+        record.undo()
+        record.scorePoint(for: .us)
+        record.endAndSave()
+
+        #expect(workout.calls == [.begin(startDate)])
+    }
+
+    @Test func finishingSavesTheWorkoutBackdatedToTheDecidedMoment() throws {
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch(), workout: workout)
+        let played = Date(timeIntervalSinceReferenceDate: 1_000)
+        for (offset, team) in gamesToLove(.us, 9).enumerated() {
+            record.scorePoint(for: team, at: played + Double(offset))
+        }
+        let decidedAt = try #require(record.decidedAt)
+        workout.calls.removeAll()
+
+        record.finish(workout: workout)
+
+        #expect(decidedAt == played + 35)
+        #expect(workout.calls == [.end(decidedAt)])
+    }
+
+    @Test func finishingAMatchEndedEarlyBackdatesItsWorkoutToTheEnd() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        record.scorePoint(for: .them)
+        let endedAt = Date(timeIntervalSinceReferenceDate: 3_000)
+        record.endAndSave(at: endedAt)
+        workout.calls.removeAll()
+
+        record.finish(workout: workout)
+
+        #expect(workout.calls == [.end(endedAt)])
+    }
+
+    @Test func aMatchIsFinishedOnceAndSavesOneWorkout() throws {
+        let record = MatchRecord.start(Rules(format: .proSet(decider: .tieBreak)), in: try relaunch(), workout: workout)
+        for team in gamesToLove(.us, 9) { record.scorePoint(for: team) }
+        workout.calls.removeAll()
+
+        record.finish(workout: workout)
+        record.finish(workout: workout)
+
+        #expect(workout.calls.count == 1)
+    }
+
+    @Test(arguments: [[Team](), [.us, .them]])
+    func abandoningAMatchDiscardsItsWorkout(pointsWonBy winners: [Team]) throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        for team in winners { record.scorePoint(for: team) }
+        workout.calls.removeAll()
+
+        record.abandon(workout: workout)
+
+        #expect(workout.calls == [.discard])
+    }
+
+    @Test func aDecidedMatchKeepsItsWorkout() throws {
+        let record = MatchRecord.start(Rules(), in: try relaunch(), workout: workout)
+        record.scorePoint(for: .us)
+        record.endAndSave()
+        workout.calls.removeAll()
+
+        record.abandon(workout: workout)
+
+        #expect(workout.calls.isEmpty)
+    }
+}
+
+/// Records what a Match asked of its workout, in order.
+@MainActor
+final class WorkoutSpy: MatchWorkout {
+    enum Call: Equatable {
+        case begin(Date), end(Date), discard
+    }
+
+    var calls: [Call] = []
+
+    func begin(at startDate: Date) { calls.append(.begin(startDate)) }
+    func end(at decidedAt: Date) { calls.append(.end(decidedAt)) }
+    func discard() { calls.append(.discard) }
 }

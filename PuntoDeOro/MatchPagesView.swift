@@ -83,13 +83,14 @@ private struct ControlsPageView: View {
     let record: MatchRecord
     @Binding var page: MatchPage
     @State private var isConfirmingEnd = false
+    @Environment(\.workout) private var workout
 
     var body: some View {
         Button {
             if record.endNeedsConfirmation {
                 isConfirmingEnd = true
             } else {
-                record.abandon()
+                record.abandon(workout: workout)
             }
         } label: {
             Text("End match")
@@ -104,7 +105,7 @@ private struct ControlsPageView: View {
         .confirmationDialog("End match?", isPresented: $isConfirmingEnd, titleVisibility: .visible) {
             Button("Save") { record.endAndSave() }
             // The only red in the app: the system's destructive role.
-            Button("Discard", role: .destructive) { record.abandon() }
+            Button("Discard", role: .destructive) { record.abandon(workout: workout) }
             Button("Cancel", role: .cancel) {}
         }
         // However the dialog closes, Cancel included, it returns to the live page rather than here,

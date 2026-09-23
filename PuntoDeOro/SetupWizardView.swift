@@ -6,6 +6,7 @@ import SwiftUI
 /// it out by making the new Match current. Neutral chrome: the gold stays with the Deciding point.
 struct SetupWizardView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.workout) private var workout
     @State private var wizard: SetupWizard
     /// Set on the first Start, so a second tap before the root swaps cannot start a second Match.
     @State private var isStarting = false
@@ -104,7 +105,7 @@ struct SetupWizardView: View {
                 Button("Start") {
                     guard !isStarting else { return }
                     isStarting = true
-                    MatchRecord.start(rules, in: context)
+                    MatchRecord.start(rules, in: context, workout: workout)
                 }
                 .buttonStyle(.borderedProminent)
                 .foregroundStyle(.black)

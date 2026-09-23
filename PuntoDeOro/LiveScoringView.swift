@@ -191,7 +191,7 @@ private extension Team {
 
 @MainActor
 private func previewRecord(_ rules: Rules = Rules(), pointsWonBy winners: [Team] = []) -> MatchRecord {
-    let record = MatchRecord.start(rules, in: previewContainer.mainContext)
+    let record = MatchRecord.start(rules, in: previewContainer.mainContext, workout: NoWorkout())
     for team in winners { record.scorePoint(for: team) }
     return record
 }

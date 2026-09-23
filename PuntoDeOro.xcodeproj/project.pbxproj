@@ -10,6 +10,7 @@
 		183042A81162D036E527E115 /* SetupWizardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */; };
 		33EF3132361FC686046AF61F /* MatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9427B1814EC8BE2BF988ACE /* MatchTests.swift */; };
 		4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B751D83F59BF072BE01CE1C /* Match.swift */; };
+		56DB16DCC70B84648F277348 /* MatchWorkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA448ADE8DB0F912B621BCE /* MatchWorkout.swift */; };
 		5CFFFEEBEED0E7E617C96222 /* PointLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178B522F26D5CC99191F89E3 /* PointLogs.swift */; };
 		5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */; };
 		981E7654B18E4E5FB7825A5E /* SetupWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */; };
@@ -35,15 +36,18 @@
 
 /* Begin PBXFileReference section */
 		0820ACD0049B3EF42241B96D /* LiveScoringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveScoringView.swift; sourceTree = "<group>"; };
+		0AA448ADE8DB0F912B621BCE /* MatchWorkout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchWorkout.swift; sourceTree = "<group>"; };
 		1451561CA9CDA25FF88AC5F3 /* AppBundleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBundleTests.swift; sourceTree = "<group>"; };
 		178B522F26D5CC99191F89E3 /* PointLogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointLogs.swift; sourceTree = "<group>"; };
 		272BC41A9E13527403A0F030 /* PuntoDeOro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PuntoDeOro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		29B3153C9F371680C540518C /* MatchRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecord.swift; sourceTree = "<group>"; };
 		2BFEDBCB64DA3B614D011C25 /* MatchRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRecordTests.swift; sourceTree = "<group>"; };
+		35FF2E5F1FFC20012592FC29 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPagesView.swift; sourceTree = "<group>"; };
 		6D66BFCEB76AA277795A1884 /* SetupWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardView.swift; sourceTree = "<group>"; };
 		861EBA065546F5BE2045B6A9 /* SetupWizardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardTests.swift; sourceTree = "<group>"; };
 		8B751D83F59BF072BE01CE1C /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
+		96177AC9FC687A49A1A2390A /* PuntoDeOro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PuntoDeOro.entitlements; sourceTree = "<group>"; };
 		B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuntoDeOroApp.swift; sourceTree = "<group>"; };
 		C57C4C03835F984BC7AA6B42 /* PuntoDeOroTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PuntoDeOroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D734FF7D4CCF7F7FBBA3F03D /* DeuceRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeuceRuleTests.swift; sourceTree = "<group>"; };
@@ -78,10 +82,13 @@
 		CA1F31394513A753031BBA21 /* PuntoDeOro */ = {
 			isa = PBXGroup;
 			children = (
+				35FF2E5F1FFC20012592FC29 /* Info.plist */,
 				0820ACD0049B3EF42241B96D /* LiveScoringView.swift */,
 				8B751D83F59BF072BE01CE1C /* Match.swift */,
 				5C32313B750FC82FFAAA2EDA /* MatchPagesView.swift */,
 				29B3153C9F371680C540518C /* MatchRecord.swift */,
+				0AA448ADE8DB0F912B621BCE /* MatchWorkout.swift */,
+				96177AC9FC687A49A1A2390A /* PuntoDeOro.entitlements */,
 				B79F92C18BA1F001CA6533C8 /* PuntoDeOroApp.swift */,
 				F453426AF151D2F08C069BBA /* RootView.swift */,
 				F76F5A0936AF3110D3BD6EC9 /* SetupWizard.swift */,
@@ -198,6 +205,7 @@
 				4D1FB45F755B04A1DB110BCE /* Match.swift in Sources */,
 				5D198300F74D0940CC0DFE38 /* MatchPagesView.swift in Sources */,
 				DAA095EDABC75F93CEF6B2CB /* MatchRecord.swift in Sources */,
+				56DB16DCC70B84648F277348 /* MatchWorkout.swift in Sources */,
 				A1461790F06BD85FFE91C037 /* PuntoDeOroApp.swift in Sources */,
 				F7C8AD2848B497CB5C7CAF3B /* RootView.swift in Sources */,
 				E2DF27672CD5AC6982791CF8 /* SetupWizard.swift in Sources */,
@@ -316,8 +324,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PuntoDeOro/PuntoDeOro.entitlements;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PuntoDeOro/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Punto de Oro";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Punto de Oro reads your heart rate and active energy to show them on the match summary.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Punto de Oro saves every match to Health as a workout.";
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.robmass.PuntoDeOro;
@@ -398,8 +410,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PuntoDeOro/PuntoDeOro.entitlements;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PuntoDeOro/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Punto de Oro";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Punto de Oro reads your heart rate and active energy to show them on the match summary.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Punto de Oro saves every match to Health as a workout.";
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.robmass.PuntoDeOro;

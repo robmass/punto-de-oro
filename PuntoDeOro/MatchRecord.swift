@@ -56,12 +56,19 @@ enum MatchSchemaV1: VersionedSchema {
 
         var match: Match { Match(rules: rules, points: points) }
 
-        /// Starts a new Match under these Rules and saves it, making it the current Match.
-        @discardableResult
-        static func start(_ rules: Rules, at startDate: Date = .now, in context: ModelContext) -> MatchRecord {
+        /// Starts a new Match under these Rules and saves it, making it the current Match, and begins
+        /// the workout it runs as.
+        @MainActor @discardableResult
+        static func start(
+            _ rules: Rules,
+            at startDate: Date = .now,
+            in context: ModelContext,
+            workout: some MatchWorkout
+        ) -> MatchRecord {
             let record = MatchRecord(rules: rules, startDate: startDate)
             context.insert(record)
             record.save()
+            workout.begin(at: startDate)
             return record
         }
 
@@ -129,21 +136,28 @@ enum MatchSchemaV1: VersionedSchema {
             save()
         }
 
-        /// End match → Discard: the Match is Abandoned and leaves no record behind.
-        func abandon() {
+        /// End match → Discard: the Match is Abandoned and leaves no record behind, nor any workout.
+        @MainActor
+        func abandon(workout: some MatchWorkout) {
             // The context is held here rather than going through `save()`, which reaches it through
             // the record being deleted.
             guard canEnd, let context = modelContext else { return }
             context.delete(self)
             do {
                 try context.save()
+                // Only once the record is gone, so a Match that survives a failed save keeps its workout.
+                workout.discard()
             } catch {
                 Logger.persistence.error("Could not abandon the Match: \(error)")
             }
         }
 
-        /// The players have left the summary: the Match is final and no longer current.
-        func finish() {
+        /// The players have left the summary: the Match is final and no longer current, and its
+        /// workout is saved as it stood when the Match was Decided.
+        @MainActor
+        func finish(workout: some MatchWorkout, at timestamp: Date = .now) {
+            guard state != .finished else { return }
+            workout.end(at: decidedAt ?? timestamp)
             state = .finished
             save()
         }

@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct PuntoDeOroApp: App {
     private let container: ModelContainer
+    private let workout = HealthWorkout()
 
     init() {
         do {
@@ -18,5 +19,6 @@ struct PuntoDeOroApp: App {
             RootView()
         }
         .modelContainer(container)
+        .environment(\.workout, workout)
     }
 }

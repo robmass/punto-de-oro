@@ -17,10 +17,25 @@ targets:
     platform: watchOS
     sources:
       - PuntoDeOro
+    # Every Match runs as a workout (spec §2, §8). No audio background mode: the app plays no audio,
+    # and haptics during a workout are covered by the session.
+    info:
+      path: PuntoDeOro/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        WKBackgroundModes:
+          - workout-processing
+    entitlements:
+      path: PuntoDeOro/PuntoDeOro.entitlements
+      properties:
+        com.apple.developer.healthkit: true
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Punto de Oro
+        INFOPLIST_KEY_NSHealthShareUsageDescription: Punto de Oro reads your heart rate and active energy to show them on the match summary.
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: Punto de Oro saves every match to Health as a workout.
         INFOPLIST_KEY_WKWatchOnly: YES
         INFOPLIST_KEY_WKApplication: YES
   PuntoDeOroTests:
