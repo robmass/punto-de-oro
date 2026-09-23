@@ -150,6 +150,10 @@ struct Score {
     private(set) var sets: [SetScore] = []
     /// The Team that won the Sets the Format asks for, once the Match is Decided.
     private(set) var winner: Team?
+    /// Whether the last Point sits on a Change of ends: an odd completed Game of the Set, or every
+    /// 6 Points of a Tie-break. Counting Games per Set cues a Set ending odd (6–3, 7–6) at its end,
+    /// and one ending even (6–4) after the first Game of the next Set.
+    private(set) var isChangeOfEnds = false
 
     var isDecided: Bool { winner != nil }
 
@@ -221,6 +225,7 @@ struct Score {
         pointsInGame[winner] += 1
         guard wasDecidingPoint || pointsInGame.hasWon(winner, reaching: tieBreak?.pointsToWin ?? 4) else {
             if isDeuce { deucesInGame += 1 }
+            isChangeOfEnds = tieBreak != nil && pointsInGame.total.isMultiple(of: 6)
             return
         }
         let gamePoints = pointsInGame
@@ -232,6 +237,7 @@ struct Score {
             return
         }
         gamesInSet[winner] += 1
+        isChangeOfEnds = !gamesInSet.total.isMultiple(of: 2)
         guard let gamesToWinSet = format.gamesToWinSet,
               tieBreak != nil || gamesInSet.hasWon(winner, reaching: gamesToWinSet) else { return }
         completeSet(SetScore(games: gamesInSet), wonBy: winner)
@@ -240,7 +246,10 @@ struct Score {
 
     private mutating func completeSet(_ set: SetScore, wonBy winner: Team) {
         sets.append(set)
-        if sets.count(where: { $0.winner == winner }) == format.setsToWin { self.winner = winner }
+        if sets.count(where: { $0.winner == winner }) == format.setsToWin {
+            self.winner = winner
+            isChangeOfEnds = false
+        }
     }
 }
 

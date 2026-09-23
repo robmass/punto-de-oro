@@ -284,11 +284,12 @@ The trailing page of the root TabView, and the screen the player stares at for n
 - **Deciding point:** the strip turns **solid gold** and shows the rule's name — `GOLDEN POINT`,
   `SILVER POINT` or `STAR POINT`.
 - **Change of ends:** the strip shows `CHANGE ENDS` in **white on the ordinary dark strip — not
-  gold** (§10: gold is reserved). It clears on the next Point.
+  gold** (§10: gold is reserved). It clears on the next Point. Inside a tie-break it stacks
+  under the `TIE-BREAK` / `SUPER TIE-BREAK` chip, one label per line, so both stay visible.
 
-The deciding-point and change-of-ends states can never collide: a change of ends only happens
-between Games, the gold strip only during one, and the Deuce rule never applies inside a
-tie-break.
+The deciding-point and change-of-ends states can never collide: outside a tie-break a change of
+ends only happens between Games and the gold strip only during one, and the Deuce rule never
+applies inside a tie-break.
 
 ### Geometry across watch sizes
 

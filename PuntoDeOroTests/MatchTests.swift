@@ -171,6 +171,71 @@ struct MatchTests {
         #expect(score.servingTeam == .them)
     }
 
+    @Test func changeOfEndsIsCuedAfterEveryOddGameOfASetAndClearsOnTheNextPoint() {
+        let cues = (0...3).map { Match(pointsWonBy: gamesToLove(.us, $0)).score.isChangeOfEnds }
+        #expect(cues == [false, true, false, true])
+
+        #expect(!Match(pointsWonBy: gamesToLove(.us, 1) + [.them]).score.isChangeOfEnds)
+    }
+
+    @Test func aSetEndingOnAnOddTotalCuesAtTheSetEnd() {
+        let sixThree = gamesToLove(.them, 3) + gamesToLove(.us, 6)
+        #expect(Match(pointsWonBy: sixThree).score.isChangeOfEnds)
+
+        let sevenSix = Match(pointsWonBy: sixAll + Array(repeating: .us, count: 7)).score
+        #expect(sevenSix.setScores == [[7, 6]])
+        #expect(sevenSix.isChangeOfEnds)
+    }
+
+    @Test func aSetEndingOnAnEvenTotalCuesAfterTheFirstGameOfTheNextSet() {
+        let sixFour = gamesToLove(.them, 4) + gamesToLove(.us, 6)
+        #expect(!Match(pointsWonBy: sixFour).score.isChangeOfEnds)
+        #expect(Match(pointsWonBy: sixFour + gamesToLove(.them, 1)).score.isChangeOfEnds)
+    }
+
+    @Test func inATieBreakChangeOfEndsIsCuedEverySixPoints() {
+        #expect(!Match(pointsWonBy: sixAll).score.isChangeOfEnds)
+
+        let alternating = (0..<14).map { $0.isMultiple(of: 2) ? Team.us : .them }
+        let cued = (1...13).filter {
+            Match(pointsWonBy: sixAll + alternating.prefix($0)).score.isChangeOfEnds
+        }
+        #expect(cued == [6, 12])
+    }
+
+    @Test func undoingBackToABoundaryReshowsTheCue() {
+        var match = Match(pointsWonBy: gamesToLove(.us, 1) + [.them])
+        #expect(!match.score.isChangeOfEnds)
+
+        match.undo()
+
+        #expect(match.score.isChangeOfEnds)
+    }
+
+    @Test func theWinningPointNeverCuesAChangeOfEnds() {
+        let sixThree = gamesToLove(.them, 3) + gamesToLove(.us, 6)
+        let score = Match(pointsWonBy: sixThree + sixThree).score
+        #expect(score.isDecided)
+        #expect(!score.isChangeOfEnds)
+    }
+
+    @Test func aSuperTieBreakCuesAChangeOfEndsEverySixPoints() {
+        let oneSetAll = gamesToLove(.us, 6) + gamesToLove(.them, 6)
+        let alternating = (0..<14).map { $0.isMultiple(of: 2) ? Team.us : .them }
+        let cued = (1...14).filter {
+            let log = oneSetAll + alternating.prefix($0)
+            return Match(rules: twoSetsPlusSuperTieBreak, pointsWonBy: log).score.isChangeOfEnds
+        }
+        #expect(cued == [6, 12])
+    }
+
+    @Test func anInfiniteMatchCuesAChangeOfEndsAfterEveryOddGameOfItsRunningCount() {
+        let cued = (1...14).filter {
+            Match(rules: infinite, pointsWonBy: gamesToLove(.us, $0)).score.isChangeOfEnds
+        }
+        #expect(cued == [1, 3, 5, 7, 9, 11, 13])
+    }
+
     @Test func aProSetIsWonByTheFirstTeamToNineGamesWithATwoGameLead() {
         let eightSeven = gamesToLove(.us, 8) + gamesToLove(.them, 7)
         #expect(!Match(rules: proSetToTieBreak, pointsWonBy: eightSeven).score.isDecided)
